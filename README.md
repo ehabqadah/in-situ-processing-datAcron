@@ -1,2 +1,2 @@
 # in-situ-processing-datAcron
-This is a component with the datAcron EU project.
+This is a component within the datAcron EU project.
