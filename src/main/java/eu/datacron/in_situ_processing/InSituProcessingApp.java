@@ -15,43 +15,52 @@ package eu.datacron.in_situ_processing;
  * the License.
  */
 
-import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-/**
- * Skeleton for a Flink Job.
- *
- * For a full example of a Flink Job, see the WordCountJob.java file in the same package/directory
- * or have a look at the website.
- *
- * You can also generate a .jar file that you can submit on your Flink cluster. Just type mvn clean
- * package in the projects root directory. You will find the jar in
- * target/flink-quickstart-0.1-SNAPSHOT-Sample.jar
- *
- */
+import eu.datacron.in_situ_processing.common.utils.Configs;
+import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
+import eu.datacron.in_situ_processing.maritime.beans.AISMessage;
+
+
+
 public class InSituProcessingApp {
+
+  private static Configs configs = Configs.getInstance();
 
   public static void main(String[] args) throws Exception {
     // set up the execution environment
-    final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+    final StreamExecutionEnvironment env = new StreamExecutionEnvBuilder().build();
+
+    StreamSourceType streamSource =
+        StreamSourceType.valueOf(configs.getStringProp("streamSourceType").toUpperCase());
 
 
-    /**
-     * Here, you can start creating your execution plan for Flink.
-     *
-     * Start with getting some data from the environment, like env.readTextFile(textPath);
-     *
-     * then, transform the resulting DataSet<String> using operations like .filter() .flatMap()
-     * .join() .coGroup() and many more. Have a look at the programming guide for the Java API:
-     *
-     * http://flink.incubator.apache.org/docs/0.6-SNAPSHOT/java_api_guide.html
-     *
-     * and the examples
-     *
-     * http://flink.incubator.apache.org/docs/0.6-SNAPSHOT/java_api_examples.html
-     *
-     */
-
+    DataStream<AISMessage> aisMessagesStream =
+        AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource));
+   
+    aisMessagesStream.print();
     // execute program
-    env.execute("Flink Java API Skeleton");
+    env.execute("datAcron In-Situ Processing");
+  }
+
+  /***
+   * Get the actual data file path or kafka topic based on the stream source type value
+   * 
+   * @param streamSource
+   * @return
+   */
+  private static String getSourceLocationProperty(StreamSourceType streamSource) {
+    switch (streamSource) {
+      case FILE:
+        return "aisMessagesFilePath";
+      case KAFKA:
+        return "inputAisTopicName";
+      default:
+        return null;
+
+
+    }
+
   }
 }
