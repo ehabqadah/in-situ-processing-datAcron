@@ -15,9 +15,10 @@ package eu.datacron.in_situ_processing;
  * the License.
  */
 
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
@@ -35,13 +36,22 @@ public class InSituProcessingApp {
 
     StreamSourceType streamSource =
         StreamSourceType.valueOf(configs.getStringProp("streamSourceType").toUpperCase());
-    // Get the json config for parsing the raw input stream 
+    // Get the json config for parsing the raw input stream
     String parsingConfig = AppUtils.getParsingJsonConfig();
 
     DataStream<AisMessage> aisMessagesStream =
-        AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),parsingConfig);
+        AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),
+            parsingConfig);
 
-    aisMessagesStream.print();
+    // assign the timestamp of the AIS messages based on their timestamps
+    DataStream<AisMessage> aisMessagesStreamWithTimeStamp =
+        aisMessagesStream.assignTimestampsAndWatermarks(new AisMessagesTimeAssigner());
+
+    // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them
+    // based on the message ID (MMSI for vessels)
+    KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
+        aisMessagesStreamWithTimeStamp.keyBy("id");
+    kaydAisMessagesStream.print();
     // execute program
     env.execute("datAcron In-Situ Processing");
   }
