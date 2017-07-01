@@ -1,8 +1,8 @@
-package eu.datacron.in_situ_processing;
+package eu.datacron.in_situ_processing.maritime.streams.operators;
 
 import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 
-import eu.datacron.in_situ_processing.maritime.beans.AisMessage;
+import eu.datacron.in_situ_processing.maritime.AisMessage;
 
 /**
  * This is a timestamp assigner of the AIS messages by using their timestamps.

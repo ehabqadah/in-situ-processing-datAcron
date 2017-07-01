@@ -18,8 +18,8 @@ import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.FileLinesStreamSource;
-import eu.datacron.in_situ_processing.maritime.beans.AisMessage;
-import eu.datacron.in_situ_processing.maritime.beans.AisMessageCsvSchema;
+import eu.datacron.in_situ_processing.maritime.AisMessage;
+import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
 
 
 

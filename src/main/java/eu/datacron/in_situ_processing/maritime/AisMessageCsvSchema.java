@@ -1,4 +1,4 @@
-package eu.datacron.in_situ_processing.maritime.beans;
+package eu.datacron.in_situ_processing.maritime;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;

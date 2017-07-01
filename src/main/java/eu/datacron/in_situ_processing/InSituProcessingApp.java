@@ -17,7 +17,6 @@ package eu.datacron.in_situ_processing;
 
 import java.util.Properties;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -29,8 +28,10 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
-import eu.datacron.in_situ_processing.maritime.beans.AisMessage;
-import eu.datacron.in_situ_processing.maritime.beans.AisMessageCsvSchema;
+import eu.datacron.in_situ_processing.maritime.AisMessage;
+import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
+import eu.datacron.in_situ_processing.maritime.streams.operators.AisMessagesTimeAssigner;
+import eu.datacron.in_situ_processing.maritime.streams.operators.AisStreamEnricher;
 
 
 
@@ -52,14 +53,7 @@ public class InSituProcessingApp {
     kaydAisMessagesStream.print();
 
     DataStream<AisMessage> enrichedAisMessagesStream =
-        kaydAisMessagesStream.map(new MapFunction<AisMessage, AisMessage>() {
-
-          @Override
-          public AisMessage map(AisMessage value) throws Exception {
-            // TODO Auto-generated method stub
-            return value;
-          }
-        });
+        kaydAisMessagesStream.map(new AisStreamEnricher());
 
     // write the enriched stream to Kafka
     writeEnrichedStreamToKafka(enrichedAisMessagesStream);
