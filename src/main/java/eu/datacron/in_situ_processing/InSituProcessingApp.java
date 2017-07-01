@@ -17,6 +17,7 @@ package eu.datacron.in_situ_processing;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
@@ -34,11 +35,12 @@ public class InSituProcessingApp {
 
     StreamSourceType streamSource =
         StreamSourceType.valueOf(configs.getStringProp("streamSourceType").toUpperCase());
-
+    // Get the json config for parsing the raw input stream 
+    String parsingConfig = AppUtils.getParsingJsonConfig();
 
     DataStream<AISMessage> aisMessagesStream =
-        AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource));
-   
+        AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),parsingConfig);
+
     aisMessagesStream.print();
     // execute program
     env.execute("datAcron In-Situ Processing");

@@ -236,12 +236,15 @@ public class AISMessage implements PositionMessage {
     this.status = value;
   }
 
-
   @Override
   public String toString() {
-
-    return getId();
+    return "AISMessage [timestamp=" + timestamp + ", id=" + id + ", longitude=" + longitude
+        + ", latitude=" + latitude + ", turn=" + turn + ", speed=" + speed + ", heading=" + heading
+        + ", course=" + course + ", status=" + status + "]";
   }
+
+
+
 
 
 
