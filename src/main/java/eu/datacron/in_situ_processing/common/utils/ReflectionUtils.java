@@ -24,12 +24,22 @@ public class ReflectionUtils {
     String fieldType = field.getType().getName();
 
     if (fieldType == DOUBLE_CLASS) {
+      if (fieldStringValue.isEmpty()) {
+        return 0.0;
+      }
       return Double.parseDouble(fieldStringValue);
 
     } else if (fieldType == LONG_CLASS) {
+      if (fieldStringValue.isEmpty()) {
+        return (long) 0;
+      }
       return Long.parseLong(fieldStringValue);
 
     } else if (fieldType == INT_CLASS) {
+
+      if (fieldStringValue.isEmpty()) {
+        return (int) 0;
+      }
       return Integer.parseInt(fieldStringValue);
 
     }

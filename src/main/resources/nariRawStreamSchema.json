@@ -1,5 +1,5 @@
 {  
-   "doc":"This schema defines the indices of AIS attributes in the input csv file, this schema for the IMIS Global files.",
+   "doc":"This schema defines the indices of AIS attributes in the input csv file, this schema for the NARI files.",
    "id":0,
    "status":1,
    "turn":2,
