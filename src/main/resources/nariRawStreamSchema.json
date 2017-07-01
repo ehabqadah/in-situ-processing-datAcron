@@ -1,0 +1,14 @@
+{  
+   "doc":"This schema defines the indices of AIS attributes in the input csv file, this schema for the IMIS Global files.",
+   "id":0,
+   "status":1,
+   "turn":2,
+   "speed":3,
+   "course":4,
+   "heading":5,
+   "longitude":6,
+   "latitude":7,
+   "timestamp":8,
+   "format":"csv",
+   "delimiter":","
+}
