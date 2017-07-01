@@ -7,7 +7,6 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.streaming.util.serialization.DeserializationSchema;
 import org.apache.flink.streaming.util.serialization.SerializationSchema;
-import org.apache.flink.util.ReflectionUtil;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
@@ -69,15 +68,20 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
     for (Field field : AisMessage.class.getFields()) {
       String fieldName = field.getName();
 
-      // Get value of the field from the csv line based on its index
-      int fieldIndex = parsingJsonConfigs.getInt(fieldName);
-      // Casr the string value of the field based on its acutal type
-      Object castedFieldValue = ReflectionUtils.getCastedFieldValue(field, fieldsValue[fieldIndex]);
-      try {
-        // set the value of the field from the csv line using reflection
-        field.set(aisMessage, castedFieldValue);
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        logger.error(e.getMessage());
+      // check if the JSON has a corresponding key for the given field
+      if (!parsingJsonConfigs.isNull(fieldName)) {
+        // Get value of the field from the csv line based on its index
+        int fieldIndex = parsingJsonConfigs.getInt(fieldName);
+        // Casr the string value of the field based on its acutal type
+        Object castedFieldValue =
+            ReflectionUtils.getCastedFieldValue(field, fieldsValue[fieldIndex]);
+
+        try {
+          // set the value of the field from the csv line using reflection
+          field.set(aisMessage, castedFieldValue);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+          logger.error(e.getMessage());
+        }
       }
     }
     return aisMessage;

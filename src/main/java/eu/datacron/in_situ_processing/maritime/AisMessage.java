@@ -1,5 +1,8 @@
 package eu.datacron.in_situ_processing.maritime;
 
+import eu.datacron.in_situ_processing.statistics.AisTrajectoryStatistics;
+import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
+
 /**
  * AIS (Automatic Identification System) message wrapper.
  * 
@@ -28,6 +31,8 @@ public class AisMessage implements PositionMessage {
   public double course;
   /** Navigational status. */
   public int status;
+  /** The statistics of ais message trajectory */
+  public StatisticsWrapper trajectoryStatistics;
 
   /**
    * Default constructor.
@@ -238,13 +243,29 @@ public class AisMessage implements PositionMessage {
 
   @Override
   public String toString() {
-    return "AISMessage [timestamp=" + timestamp + ", id=" + id + ", longitude=" + longitude
-        + ", latitude=" + latitude + ", turn=" + turn + ", speed=" + speed + ", heading=" + heading
-        + ", course=" + course + ", status=" + status + "]";
+    String message =
+        "AISMessage [timestamp=" + timestamp + ", id=" + id + ", longitude=" + longitude
+            + ", latitude=" + latitude + ", turn=" + turn + ", speed=" + speed + ", heading="
+            + heading + ", course=" + course + ", status=" + status + "]";
+
+    if (getStatistics() != null) {
+
+      message += getStatistics().toString();
+    }
+    return message;
   }
 
+  @Override
+  public StatisticsWrapper getStatistics() {
 
+    return trajectoryStatistics;
+  }
 
+  @Override
+  public void setStatistics(StatisticsWrapper value) {
+    this.trajectoryStatistics = value;
+
+  }
 
 
 

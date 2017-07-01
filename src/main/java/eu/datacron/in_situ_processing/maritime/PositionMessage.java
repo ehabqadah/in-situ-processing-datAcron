@@ -2,6 +2,8 @@ package eu.datacron.in_situ_processing.maritime;
 
 import java.io.Serializable;
 
+import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
+
 /**
  * @author ehab.qadah
  */
@@ -14,5 +16,10 @@ public interface PositionMessage extends Serializable {
   Long getTimestamp();
 
   void setTimestamp(Long value);
+  
+  
+  StatisticsWrapper getStatistics();
+
+  void setStatistics(StatisticsWrapper value);
 
 }
