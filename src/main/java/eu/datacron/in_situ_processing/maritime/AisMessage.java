@@ -267,6 +267,21 @@ public class AisMessage implements PositionMessage {
 
   }
 
+  @Override
+  public String toCsv() {
+    String message =
+         timestamp + "," + id + "," + longitude
+            + "," + latitude + "," + turn + "," + speed + ","
+            + heading + "," + course + "," + status;
+
+    if (getStatistics() != null) {
+
+      message +="," +getStatistics().toCsv();
+    }
+    return message;
+  
+  }
+
 
 
 }

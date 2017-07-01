@@ -48,7 +48,7 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
 
   @Override
   public byte[] serialize(AisMessage element) {
-    return element.toString().getBytes(StandardCharsets.UTF_8);
+    return element.toCsv().getBytes(StandardCharsets.UTF_8);
   }
 
   @Override

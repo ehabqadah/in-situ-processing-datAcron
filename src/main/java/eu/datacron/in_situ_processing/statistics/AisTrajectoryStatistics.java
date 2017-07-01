@@ -29,6 +29,10 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
     return "AisTrajectoryStatistics [numberOfPoints=" + getNumberOfPoints() + "]";
   }
 
+  @Override
+  public String toCsv() {
+    return "" + getNumberOfPoints() + "";
+  }
 
 
 }

@@ -32,4 +32,6 @@ public abstract class StatisticsWrapper implements Serializable {
    * @param positionMessage
    */
   public abstract void processNewPosition(PositionMessage positionMessage);
+  
+  public abstract String toCsv();
 }

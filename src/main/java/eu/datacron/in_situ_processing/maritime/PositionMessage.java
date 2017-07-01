@@ -21,5 +21,7 @@ public interface PositionMessage extends Serializable {
   StatisticsWrapper getStatistics();
 
   void setStatistics(StatisticsWrapper value);
+  
+  String toCsv();
 
 }
