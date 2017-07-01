@@ -15,14 +15,22 @@ package eu.datacron.in_situ_processing;
  * the License.
  */
 
+import java.util.Properties;
+
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010.FlinkKafkaProducer010Configuration;
+import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
 import eu.datacron.in_situ_processing.maritime.beans.AisMessage;
+import eu.datacron.in_situ_processing.maritime.beans.AisMessageCsvSchema;
 
 
 
@@ -39,6 +47,51 @@ public class InSituProcessingApp {
     // Get the json config for parsing the raw input stream
     String parsingConfig = AppUtils.getParsingJsonConfig();
 
+    KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
+        setupKayedAisMessagesStream(env, streamSource, parsingConfig);
+    kaydAisMessagesStream.print();
+
+    DataStream<AisMessage> enrichedAisMessagesStream =
+        kaydAisMessagesStream.map(new MapFunction<AisMessage, AisMessage>() {
+
+          @Override
+          public AisMessage map(AisMessage value) throws Exception {
+            // TODO Auto-generated method stub
+            return value;
+          }
+        });
+
+    // write the enriched stream to Kafka
+    writeEnrichedStreamToKafka(enrichedAisMessagesStream);
+
+    // execute program
+    env.execute("datAcron In-Situ Processing");
+  }
+
+  private static void writeEnrichedStreamToKafka(DataStream<AisMessage> enrichedAisMessagesStream) {
+
+    Properties producerProps = AppUtils.getKafkaProducerProperties();
+    String outputStreamTopic = configs.getStringProp("outputStreamTopicName");
+
+    FlinkKafkaProducer010Configuration<AisMessage> myProducerConfig =
+        FlinkKafkaProducer010.writeToKafkaWithTimestamps(enrichedAisMessagesStream,
+            outputStreamTopic, new AisMessageCsvSchema(), producerProps);
+
+    // the following is necessary for at-least-once delivery guarantee
+    myProducerConfig.setLogFailuresOnly(false); // "false" by default
+    myProducerConfig.setFlushOnCheckpoint(true); // "false" by default
+  }
+
+  /***
+   * Setup the kayed stream of AIS messages from a raw stream.
+   * 
+   * @param env
+   * @param streamSource
+   * @param parsingConfig
+   * @return
+   */
+  private static KeyedStream<AisMessage, Tuple> setupKayedAisMessagesStream(
+      final StreamExecutionEnvironment env, StreamSourceType streamSource, String parsingConfig) {
     DataStream<AisMessage> aisMessagesStream =
         AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),
             parsingConfig);
@@ -51,9 +104,7 @@ public class InSituProcessingApp {
     // based on the message ID (MMSI for vessels)
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
         aisMessagesStreamWithTimeStamp.keyBy("id");
-    kaydAisMessagesStream.print();
-    // execute program
-    env.execute("datAcron In-Situ Processing");
+    return kaydAisMessagesStream;
   }
 
   /***
@@ -67,7 +118,7 @@ public class InSituProcessingApp {
       case FILE:
         return "aisMessagesFilePath";
       case KAFKA:
-        return "inputAisTopicName";
+        return "inputStreamTopicName";
       default:
         return null;
 
