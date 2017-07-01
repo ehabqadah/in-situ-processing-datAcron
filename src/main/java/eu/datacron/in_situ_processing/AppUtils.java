@@ -18,8 +18,8 @@ import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.FileLinesStreamSource;
-import eu.datacron.in_situ_processing.maritime.beans.AISMessage;
-import eu.datacron.in_situ_processing.maritime.beans.AISMessageCSVSchema;
+import eu.datacron.in_situ_processing.maritime.beans.AisMessage;
+import eu.datacron.in_situ_processing.maritime.beans.AisMessageCsvSchema;
 
 
 
@@ -42,16 +42,16 @@ public class AppUtils {
    * @param parsingConfig
    * @return
    */
-  public static DataStream<AISMessage> getAISMessagesStream(StreamExecutionEnvironment env,
+  public static DataStream<AisMessage> getAISMessagesStream(StreamExecutionEnvironment env,
       StreamSourceType streamSource, String filePathOrTopicProperty, String parsingConfig) {
-    DataStream<AISMessage> aisMessagesStream = null;
+    DataStream<AisMessage> aisMessagesStream = null;
     switch (streamSource) {
       case KAFKA:
         Properties kafakaProps = getKafkaConsumerProperties();
         // create a Kafka consumer
-        FlinkKafkaConsumer010<AISMessage> kafkaConsumer =
-            new FlinkKafkaConsumer010<AISMessage>(configs.getStringProp(filePathOrTopicProperty),
-                new AISMessageCSVSchema(parsingConfig), kafakaProps);
+        FlinkKafkaConsumer010<AisMessage> kafkaConsumer =
+            new FlinkKafkaConsumer010<AisMessage>(configs.getStringProp(filePathOrTopicProperty),
+                new AisMessageCsvSchema(parsingConfig), kafakaProps);
         // kafkaConsumer.assignTimestampsAndWatermarks(arg0)
         aisMessagesStream = env.addSource(kafkaConsumer);
         break;
@@ -107,20 +107,20 @@ public class AppUtils {
 
   }
 
-  public static final class CSVLineToAISMessageMapper implements MapFunction<String, AISMessage> {
+  public static final class CSVLineToAISMessageMapper implements MapFunction<String, AisMessage> {
 
     private static final long serialVersionUID = -7969686242238108964L;
-    DeserializationSchema<AISMessage> deserializationSchema;
+    DeserializationSchema<AisMessage> deserializationSchema;
 
     public CSVLineToAISMessageMapper() {}
 
     // map a csv line to AISMessage using the AIS messages deserialization schema
     public CSVLineToAISMessageMapper(String parsingJsonConfigs) {
-      deserializationSchema = new AISMessageCSVSchema(parsingJsonConfigs);
+      deserializationSchema = new AisMessageCsvSchema(parsingJsonConfigs);
     }
 
     @Override
-    public AISMessage map(String value) throws Exception {
+    public AisMessage map(String value) throws Exception {
       return deserializationSchema.deserialize(value.getBytes(StandardCharsets.UTF_8));
 
     }

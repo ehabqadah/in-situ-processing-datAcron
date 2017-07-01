@@ -15,21 +15,21 @@ import eu.datacron.in_situ_processing.common.utils.ReflectionUtils;
 
 
 /**
- * A serialization schema for the {@link AISMessage}
+ * A serialization schema for the {@link AisMessage}
  * 
  * @author ehab.qadah
  */
-public class AISMessageCSVSchema implements SerializationSchema<AISMessage>,
-    DeserializationSchema<AISMessage> {
+public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
+    DeserializationSchema<AisMessage> {
 
   private static final long serialVersionUID = 4339578918900034257L;
-  private static final Logger logger = Logger.getLogger(AISMessageCSVSchema.class.getName());
+  private static final Logger logger = Logger.getLogger(AisMessageCsvSchema.class.getName());
   private transient JSONObject parsingJsonConfigs;
   private String parsingJsonConfigsStr;
 
-  public AISMessageCSVSchema() {}
+  public AisMessageCsvSchema() {}
 
-  public AISMessageCSVSchema(String parsingJsonConfigsStr) {
+  public AisMessageCsvSchema(String parsingJsonConfigsStr) {
     this.parsingJsonConfigsStr = parsingJsonConfigsStr;
     initParsingConfigObject();
   }
@@ -42,31 +42,31 @@ public class AISMessageCSVSchema implements SerializationSchema<AISMessage>,
   }
 
   @Override
-  public TypeInformation<AISMessage> getProducedType() {
-    return TypeExtractor.getForClass(AISMessage.class);
+  public TypeInformation<AisMessage> getProducedType() {
+    return TypeExtractor.getForClass(AisMessage.class);
 
   }
 
   @Override
-  public byte[] serialize(AISMessage element) {
+  public byte[] serialize(AisMessage element) {
     return element.toString().getBytes(StandardCharsets.UTF_8);
   }
 
   @Override
-  public AISMessage deserialize(byte[] aisMessageBytes) {
+  public AisMessage deserialize(byte[] aisMessageBytes) {
     // Deserialize the byte array of csv line
     String csvLine = new String(aisMessageBytes, StandardCharsets.UTF_8);
     return parseCSVline(csvLine);
 
   }
 
-  private AISMessage parseCSVline(String csvLine) {
+  private AisMessage parseCSVline(String csvLine) {
     initParsingConfigObject();
-    AISMessage aisMessage = new AISMessage();
+    AisMessage aisMessage = new AisMessage();
     String delimiter = parsingJsonConfigs.getString("delimiter");
     String[] fieldsValue = csvLine.split(delimiter);
 
-    for (Field field : AISMessage.class.getFields()) {
+    for (Field field : AisMessage.class.getFields()) {
       String fieldName = field.getName();
 
       // Get value of the field from the csv line based on its index
@@ -86,7 +86,7 @@ public class AISMessageCSVSchema implements SerializationSchema<AISMessage>,
 
 
   @Override
-  public boolean isEndOfStream(AISMessage nextElement) {
+  public boolean isEndOfStream(AisMessage nextElement) {
     return false;
   }
 }

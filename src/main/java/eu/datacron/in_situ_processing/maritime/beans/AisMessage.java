@@ -6,7 +6,7 @@ package eu.datacron.in_situ_processing.maritime.beans;
  * @author ehabqadah
  *
  */
-public class AISMessage implements PositionMessage {
+public class AisMessage implements PositionMessage {
   private static final long serialVersionUID = 7555537850826069540L;
 
 
@@ -32,7 +32,7 @@ public class AISMessage implements PositionMessage {
   /**
    * Default constructor.
    */
-  public AISMessage() {}
+  public AisMessage() {}
 
   /**
    * All-args constructor.
@@ -50,7 +50,7 @@ public class AISMessage implements PositionMessage {
    * @param course Course over ground (allowed values: 0-359.9 degrees).
    * @param status Navigational status.
    */
-  public AISMessage(Long timestamp, String id, Double longitude, Double latitude, Double turn,
+  public AisMessage(Long timestamp, String id, Double longitude, Double latitude, Double turn,
       Double speed, Integer heading, Double course, Integer status) {
     this.timestamp = timestamp;
     this.id = id;

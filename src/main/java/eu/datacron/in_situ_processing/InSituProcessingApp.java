@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
-import eu.datacron.in_situ_processing.maritime.beans.AISMessage;
+import eu.datacron.in_situ_processing.maritime.beans.AisMessage;
 
 
 
@@ -38,7 +38,7 @@ public class InSituProcessingApp {
     // Get the json config for parsing the raw input stream 
     String parsingConfig = AppUtils.getParsingJsonConfig();
 
-    DataStream<AISMessage> aisMessagesStream =
+    DataStream<AisMessage> aisMessagesStream =
         AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),parsingConfig);
 
     aisMessagesStream.print();
