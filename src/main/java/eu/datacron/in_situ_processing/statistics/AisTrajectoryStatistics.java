@@ -110,7 +110,10 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
 
   @Override
   public String toCsv() {
-    return toString();
+    return getAverageDiffTime() + "," + getNumberOfPoints() + "," + getLastTimestamp() + ","
+        + getLastDiffTime() + "," + getMinSpeed() + "," + getMinDiffTime() + "," + getMaxSpeed()
+        + "," + getMaxDiffTime() + "," + getMinLong() + "," + getMaxLong() + "," + getMinLat()
+        + "," + getMaxLat() + "," + getLastDifftime() + "," + getAverageSpeed();
   }
 
 

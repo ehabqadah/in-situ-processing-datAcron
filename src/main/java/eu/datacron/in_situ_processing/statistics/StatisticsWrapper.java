@@ -31,8 +31,8 @@ public abstract class StatisticsWrapper implements Serializable {
 
   public double averageDiffTime;
 
-  
-  
+
+
   public double getAverageDiffTime() {
     return averageDiffTime;
   }
