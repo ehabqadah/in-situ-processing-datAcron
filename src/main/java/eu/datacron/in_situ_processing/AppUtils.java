@@ -57,7 +57,7 @@ public class AppUtils {
         break;
       case FILE:
         aisMessagesStream =
-            env.addSource(new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),5000))
+            env.addSource(new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),1000))
                 .setParallelism(1).map(new CSVLineToAISMessageMapper(parsingConfig));
 
         break;

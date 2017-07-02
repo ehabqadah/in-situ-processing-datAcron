@@ -50,11 +50,12 @@ public class InSituProcessingApp {
 
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
         setupKayedAisMessagesStream(env, streamSource, parsingConfig);
-    kaydAisMessagesStream.print();
+
 
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStream.map(new AisStreamEnricher());
 
+    enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka
     writeEnrichedStreamToKafka(enrichedAisMessagesStream);
 
@@ -92,7 +93,8 @@ public class InSituProcessingApp {
 
     // assign the timestamp of the AIS messages based on their timestamps
     DataStream<AisMessage> aisMessagesStreamWithTimeStamp =
-        aisMessagesStream.assignTimestampsAndWatermarks(new AisMessagesTimeAssigner());
+        aisMessagesStream.assignTimestampsAndWatermarks(new AisMessagesTimeAssigner()).filter(
+            ais -> ais.getId().equals("228037600"));// TODO: remove debug code
 
     // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them
     // based on the message ID (MMSI for vessels)
