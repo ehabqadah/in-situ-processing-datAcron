@@ -20,11 +20,9 @@ import java.util.Properties;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010.FlinkKafkaProducer010Configuration;
-import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;

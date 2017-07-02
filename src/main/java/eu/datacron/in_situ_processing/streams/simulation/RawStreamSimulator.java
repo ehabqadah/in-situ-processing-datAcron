@@ -1,5 +1,7 @@
 package eu.datacron.in_situ_processing.streams.simulation;
 
+import java.util.Properties;
+
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -33,7 +35,13 @@ public class RawStreamSimulator {
     KeyedStream<Tuple3<String, Long, String>, Tuple> kaydRawMessagesStream =
         setupKayedRawMessagesStream(env, parsingConfig);
 
-    kaydRawMessagesStream.print();
+    String outputStreamTopicName = configs.getStringProp("inputStreamTopicName");
+    double streamDelayScale = configs.getDoubleProp("streamDelayScale");
+    Properties producerProps = AppUtils.getKafkaProducerProperties();
+
+    // replay the stream
+    kaydRawMessagesStream.map(new StreamPlayer(streamDelayScale, outputStreamTopicName,
+        producerProps));
 
     // execute program
     env.execute("datAcron In-Situ Processing Stream Simulator");

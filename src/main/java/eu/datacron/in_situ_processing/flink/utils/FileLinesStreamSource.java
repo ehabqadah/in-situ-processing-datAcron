@@ -54,6 +54,8 @@ public class FileLinesStreamSource implements SourceFunction<String> {
         logger.error(e.getMessage(), e);
         break;
       }
+
+      Thread.sleep(100000);
       running = false;
     }
   }
