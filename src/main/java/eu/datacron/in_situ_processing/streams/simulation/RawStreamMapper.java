@@ -34,7 +34,6 @@ public class RawStreamMapper implements MapFunction<String, Tuple3<String, Long,
     return parseRawLine(value);
   }
 
-
   /**
    * Extract the message id & timestamp
    * 
@@ -54,6 +53,4 @@ public class RawStreamMapper implements MapFunction<String, Tuple3<String, Long,
 
     return new Tuple3<String, Long, String>(id, timestamp, value);
   }
-
-
 }

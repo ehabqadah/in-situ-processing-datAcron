@@ -57,7 +57,14 @@ public class StreamPlayer extends
   }
 
 
-
+  /**
+   * Find the delay between the new raw message and the last received one
+   * 
+   * @param rawMessageTuple
+   * @return
+   * @throws IOException
+   * @throws InterruptedException
+   */
   private long getSimulatedTimeDelayBetweenRawMessages(Tuple3<String, Long, String> rawMessageTuple)
       throws IOException, InterruptedException {
     // access the state value
@@ -66,10 +73,8 @@ public class StreamPlayer extends
         lastTimestamp.value() == null ? currentPointTimestamp : lastTimestamp.value();
     lastTimestamp.update(currentPointTimestamp);
     long delay = (long) ((currentPointTimestamp - lastPointTimeStamp) * simulationWaitingScale);
-
     return delay;
   }
-
 
   private void setupProducer() {
 
@@ -82,7 +87,6 @@ public class StreamPlayer extends
   public void writeRawMessageWithDelay(Tuple3<String, Long, String> rawMessageTuple, long delay) {
 
     long writeDelay = Math.abs(delay);
-    // writeMessageToKafka(rawMessageTuple);
     new Thread(new Runnable() {
       @Override
       public void run() {
@@ -94,16 +98,20 @@ public class StreamPlayer extends
             System.err.println(e);
           }
         }
-
+        // send the message to Kafka
         writeMessageToKafka(rawMessageTuple);
       }
-
 
     }).run();
 
 
   }
 
+  /**
+   * Send the original raw message back to Kafka after simulating the time delay
+   * 
+   * @param rawMessageTuple
+   */
   private void writeMessageToKafka(Tuple3<String, Long, String> rawMessageTuple) {
     if (producer == null)
       setupProducer();

@@ -32,7 +32,6 @@ import eu.datacron.in_situ_processing.maritime.streams.operators.AisMessagesTime
 import eu.datacron.in_situ_processing.maritime.streams.operators.AisStreamEnricher;
 
 
-
 public class InSituProcessingApp {
 
   private static Configs configs = Configs.getInstance();

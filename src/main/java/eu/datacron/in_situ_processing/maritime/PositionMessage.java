@@ -16,12 +16,12 @@ public interface PositionMessage extends Serializable {
   Long getTimestamp();
 
   void setTimestamp(Long value);
-  
-  
+
+
   StatisticsWrapper getStatistics();
 
   void setStatistics(StatisticsWrapper value);
-  
+
   String toCsv();
 
 }

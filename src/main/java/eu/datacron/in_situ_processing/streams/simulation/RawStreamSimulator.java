@@ -7,7 +7,6 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 
 import eu.datacron.in_situ_processing.AppUtils;
 import eu.datacron.in_situ_processing.common.utils.Configs;
@@ -20,8 +19,6 @@ import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
  * @author ehab.qadah
  */
 public class RawStreamSimulator {
-
-
 
   private static Configs configs = Configs.getInstance();
 
@@ -70,17 +67,6 @@ public class RawStreamSimulator {
     KeyedStream<Tuple3<String, Long, String>, Tuple> kaydAisMessagesStream =
         rawStreamWithTimeStamp.keyBy(0);
     return kaydAisMessagesStream;
-  }
-
-  public static final class RawMessageTimestampAssigner extends
-      AscendingTimestampExtractor<Tuple3<String, Long, String>> {
-    private static final long serialVersionUID = -3203754108824557827L;
-
-    @Override
-    public long extractAscendingTimestamp(Tuple3<String, Long, String> element) {
-
-      return element.f1;
-    }
   }
 
 }

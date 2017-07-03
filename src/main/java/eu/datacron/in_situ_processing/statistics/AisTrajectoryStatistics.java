@@ -116,5 +116,4 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
         + "," + getMaxLat() + "," + getLastDifftime() + "," + getAverageSpeed();
   }
 
-
 }

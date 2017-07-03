@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 /**
  * Flink Stream execution builder.
  * 
- * @author ehabqadah
+ * @author ehab.qadah
  *
  */
 public class StreamExecutionEnvBuilder {
@@ -14,8 +14,7 @@ public class StreamExecutionEnvBuilder {
   private StreamExecutionEnvironment env;
 
   public StreamExecutionEnvBuilder() {
-
-    // setup the environment with default values 
+    // setup the environment with default values
     // set up streaming execution environment
     env = StreamExecutionEnvironment.getExecutionEnvironment();
     // configure event-time characteristics

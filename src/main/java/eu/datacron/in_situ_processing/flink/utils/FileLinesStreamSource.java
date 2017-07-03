@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-
 import org.apache.log4j.Logger;
 
 /**

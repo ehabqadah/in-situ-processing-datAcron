@@ -1,6 +1,5 @@
 package eu.datacron.in_situ_processing.maritime;
 
-import eu.datacron.in_situ_processing.statistics.AisTrajectoryStatistics;
 import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
 
 /**
