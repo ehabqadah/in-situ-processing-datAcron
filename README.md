@@ -1,6 +1,6 @@
-# in-situ-processing-datAcron
+# In-Situ Processing - datAcron
 
-This is a component within the datAcron EU project.
+This is a component within the [datAcron EU](http://www.datacron-project.eu/) project.
 
 This project aims to provide a module that process a stream of raw messages
 (i.e., AIS messages) and enrich it with derived attributes such min/max, average and variance of original fields.
