@@ -24,9 +24,18 @@ In addition, a stream simulator for the raw messages is developed in the context
 
     228037600,1443650450,-4.4460735,48.15768,-127.0,9.0,511,87.2,15,7.75,4,1443650450,11,9.0,9  ,9.1,11,-4.4480133,-4.4460735,48.157574,48.15768,11,9.075,0.0018749999999841
 ```
-# Generate jar file
- * To generate a .jar file that you can submit on your Flink cluster, run the  'mvn  clean package' command  in the projects root directory.
- * The file is located in 'target/in-situ-processing-1.0.1.jar'.
+# Run on Flink (locally):
+ * To run the **In-Situ Processing module** on Flink cluster (locally):
+    * Go the root directory of the project.
+    * Edit the 'scripts/runInSituOnFlinkLocally.sh' and update the correct local directory of the Flink installation for the `FLINK_DIR`  in the script.
+    * Make sure that the script file has a permission to be executed, use 'chmod +x scripts/runInSituOnFlinkLocally.sh'.
+    * Run the script by `./scripts/runInSituOnFlinkLocally.sh` that submit the In-Situ Processing job to the local Flink cluster.
+
+ * To run the **Stream Simulator** component on Flink cluster (locally):
+      * Go the root directory of the project.
+      * Edit the 'scripts/runSimulatorOnFlinkLocally.sh' and update the correct local directory of the Flink installation for the `FLINK_DIR`  in the script.
+      * Make sure that the script file has a permission to be executed, use 'chmod +x scripts/runSimulatorOnFlinkLocally.sh'.
+      * Run the script by `./scripts/runSimulatorOnFlinkLocally.sh` that submit the Stream simulator job to the local Flink cluster.    
 
 # Setup in development mode:
 * To Setup the Kafka cluster locally, run a predefined shell script `scrips/setup-kafka.sh`
