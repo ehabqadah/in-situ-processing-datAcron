@@ -54,20 +54,21 @@ public class InSituProcessingApp {
 
     enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka
-    writeEnrichedStreamToKafka(enrichedAisMessagesStream);
+    writeEnrichedStreamToKafka(enrichedAisMessagesStream, parsingConfig);
 
     // execute program
     env.execute("datAcron In-Situ Processing");
   }
 
-  private static void writeEnrichedStreamToKafka(DataStream<AisMessage> enrichedAisMessagesStream) {
+  private static void writeEnrichedStreamToKafka(DataStream<AisMessage> enrichedAisMessagesStream,
+      String parsingConfig) {
 
     Properties producerProps = AppUtils.getKafkaProducerProperties();
     String outputStreamTopic = configs.getStringProp("outputStreamTopicName");
 
     FlinkKafkaProducer010Configuration<AisMessage> myProducerConfig =
         FlinkKafkaProducer010.writeToKafkaWithTimestamps(enrichedAisMessagesStream,
-            outputStreamTopic, new AisMessageCsvSchema(), producerProps);
+            outputStreamTopic, new AisMessageCsvSchema(parsingConfig), producerProps);
 
     // the following is necessary for at-least-once delivery guarantee
     myProducerConfig.setLogFailuresOnly(false); // "false" by default

@@ -267,14 +267,16 @@ public class AisMessage implements PositionMessage {
   }
 
   @Override
-  public String toCsv() {
+  public String toCsv(String delimiter) {
+
     String message =
-        id + "," + timestamp + "," + longitude + "," + latitude + "," + turn + "," + speed + ","
-            + heading + "," + course + "," + status;
+        id + delimiter + timestamp + delimiter + longitude + delimiter + latitude + delimiter
+            + turn + delimiter + speed + delimiter + heading + delimiter + course + delimiter
+            + status;
 
     if (getStatistics() != null) {
 
-      message += "," + getStatistics().toCsv();
+      message += delimiter + getStatistics().toCsv(delimiter);
     }
     return message;
 

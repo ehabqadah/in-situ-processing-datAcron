@@ -25,6 +25,7 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
   private static final Logger logger = Logger.getLogger(AisMessageCsvSchema.class.getName());
   private transient JSONObject parsingJsonConfigs;
   private String parsingJsonConfigsStr;
+  String delimiter;
 
   public AisMessageCsvSchema() {}
 
@@ -37,18 +38,18 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
     // make sure that parsing config object is initialized
     if (parsingJsonConfigs == null) {
       this.parsingJsonConfigs = new JSONObject(parsingJsonConfigsStr);
+      delimiter = parsingJsonConfigs.getString("delimiter");
     }
   }
 
   @Override
   public TypeInformation<AisMessage> getProducedType() {
     return TypeExtractor.getForClass(AisMessage.class);
-
   }
 
   @Override
   public byte[] serialize(AisMessage element) {
-    return element.toCsv().getBytes(StandardCharsets.UTF_8);
+    return element.toCsv(delimiter).getBytes(StandardCharsets.UTF_8);
   }
 
   @Override
@@ -56,13 +57,12 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
     // Deserialize the byte array of csv line
     String csvLine = new String(aisMessageBytes, StandardCharsets.UTF_8);
     return parseCSVline(csvLine);
-
   }
 
   private AisMessage parseCSVline(String csvLine) {
     initParsingConfigObject();
     AisMessage aisMessage = new AisMessage();
-    String delimiter = parsingJsonConfigs.getString("delimiter");
+
     String[] fieldsValue = csvLine.split(delimiter);
 
     for (Field field : AisMessage.class.getFields()) {
@@ -86,8 +86,6 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
     }
     return aisMessage;
   }
-
-
 
   @Override
   public boolean isEndOfStream(AisMessage nextElement) {

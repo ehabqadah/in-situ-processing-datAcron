@@ -1,6 +1,8 @@
 package eu.datacron.in_situ_processing.statistics;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import eu.datacron.in_situ_processing.maritime.PositionMessage;
 
@@ -13,7 +15,6 @@ public abstract class StatisticsWrapper implements Serializable {
   protected long numberOfPoints = 0;
   protected long lastTimestamp;
 
-
   protected long lastDifftime;
   /** min/max values of attributes **/
   protected double minSpeed;
@@ -24,14 +25,14 @@ public abstract class StatisticsWrapper implements Serializable {
   protected double maxLong;
   protected double minLat;
   protected double maxLat;
+  protected List<Double> prevSpeeds = new ArrayList<Double>();
 
-  /** Average attributes **/
-
+  /** Average of attributes **/
   public double averageSpeed;
-
   public double averageDiffTime;
 
-
+  /** Variance of attributes **/
+  public double varianceSpeed;
 
   public double getAverageDiffTime() {
     return averageDiffTime;
@@ -103,6 +104,13 @@ public abstract class StatisticsWrapper implements Serializable {
     return maxLat;
   }
 
+  public double getVarianceSpeed() {
+    return varianceSpeed;
+  }
+
+  public void setVarianceSpeed(double varianceSpeed) {
+    this.varianceSpeed = varianceSpeed;
+  }
 
   public void setMinSpeed(double minSpeed) {
     this.minSpeed = Math.min(this.minSpeed, minSpeed);
@@ -159,5 +167,5 @@ public abstract class StatisticsWrapper implements Serializable {
    */
   public abstract void processNewPosition(PositionMessage positionMessage);
 
-  public abstract String toCsv();
+  public abstract String toCsv(String delimiter);
 }

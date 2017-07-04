@@ -18,7 +18,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
   public void processNewPosition(PositionMessage positionMessage) {
     if (positionMessage instanceof AisMessage) {
       AisMessage aisMessage = (AisMessage) positionMessage;
-      // TODO: compute all others statistics
+
       if (getNumberOfPoints() == 0) {
         initFirstMessageAttributes(aisMessage);
       }
@@ -26,13 +26,9 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
       updateLocationAttributes(aisMessage);
       // update time related attributes
       updateTimeAttributes(aisMessage);
-
       updateSpeedAttributes(aisMessage);
-
       increasePointssCount();
-
     }
-
   }
 
   /**
@@ -55,14 +51,23 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
   }
 
   private void updateSpeedAttributes(AisMessage aisMessage) {
-    setMinSpeed(aisMessage.getSpeed());
-    setMaxSpeed(aisMessage.getSpeed());
+    Double speed = aisMessage.getSpeed();
+    setMinSpeed(speed);
+    setMaxSpeed(speed);
     double oldAverageSpeed = getAverageSpeed();
-    double aggreagtedSpeedSum = oldAverageSpeed * getNumberOfPoints() + aisMessage.getSpeed();
+    double aggreagtedSpeedSum = oldAverageSpeed * getNumberOfPoints() + speed;
     double pointsCount = getNumberOfPoints() + 1.0;
     // compute new average
     double newAverageSpeed = aggreagtedSpeedSum / pointsCount;
     setAverageSpeed(newAverageSpeed);
+    // compute the speed variance
+    this.prevSpeeds.add(speed);
+    double sumOfSquareMeanDiff = 0.0;
+    for (double prevSpeed : this.prevSpeeds) {
+      sumOfSquareMeanDiff += Math.pow(prevSpeed - newAverageSpeed, 2);
+    }
+    // set variance of speed
+    setVarianceSpeed(sumOfSquareMeanDiff / pointsCount);
   }
 
   private void updateTimeAttributes(AisMessage aisMessage) {
@@ -89,11 +94,9 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
   private void updateLocationAttributes(AisMessage aisMessage) {
     setMaxLat(aisMessage.getLatitude());
     setMinLat(aisMessage.getLatitude());
-
     setMaxLong(aisMessage.getLongitude());
     setMinLong(aisMessage.getLongitude());
   }
-
 
 
   @Override
@@ -105,15 +108,18 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
         + getMaxSpeed() + ", getMaxDiffTime()=" + getMaxDiffTime() + ", getMinLong()="
         + getMinLong() + ", getMaxLong()=" + getMaxLong() + ", getMinLat()=" + getMinLat()
         + ", getMaxLat()=" + getMaxLat() + ", getLastDifftime()=" + getLastDifftime()
-        + ", getAverageSpeed()=" + getAverageSpeed() + "] \n";
+        + ", getAverageSpeed()=" + getAverageSpeed() + ", getVarianceSpeed()=" + getVarianceSpeed()
+        + "] \n";
   }
 
   @Override
-  public String toCsv() {
-    return getAverageDiffTime() + "," + getNumberOfPoints() + "," + getLastTimestamp() + ","
-        + getLastDiffTime() + "," + getMinSpeed() + "," + getMinDiffTime() + "," + getMaxSpeed()
-        + "," + getMaxDiffTime() + "," + getMinLong() + "," + getMaxLong() + "," + getMinLat()
-        + "," + getMaxLat() + "," + getLastDifftime() + "," + getAverageSpeed();
+  public String toCsv(String delimiter) {
+
+    return getAverageDiffTime() + delimiter + getNumberOfPoints() + delimiter + getLastTimestamp()
+        + delimiter + getLastDiffTime() + delimiter + getMinSpeed() + delimiter + getMinDiffTime()
+        + delimiter + getMaxSpeed() + delimiter + getMaxDiffTime() + delimiter + getMinLong()
+        + delimiter + getMaxLong() + delimiter + getMinLat() + delimiter + getMaxLat() + delimiter
+        + getLastDifftime() + delimiter + getAverageSpeed() + delimiter + getVarianceSpeed();
   }
 
 }
