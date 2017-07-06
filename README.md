@@ -7,9 +7,9 @@ This project aims to provide a module that process a stream of raw messages
 
 In addition, a stream simulator for the raw messages is developed in the context of this module, which provides a functionality to replay the original stream of raw messages by generating a simulated new Kafka Stream and taking into the account the time delay between two consecutive messages of a trajectory, furthermore, this delay can be scaled in/out by a configuration parameter.
 
-### Contributors:
- * Ehab Qadah <br/>
- * PD Dr. Michael Mock
+### Contributers:
+ ehab.qadah@iais.fraunhofer.de,<br/>
+ michael.mock@iais.fraunhofer.de 
 
 # Output Format:
  * The output line header for the maritime use case is as the following:
