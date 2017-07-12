@@ -2,28 +2,53 @@
 
 This is a component within the [datAcron EU](http://www.datacron-project.eu/) project.
 
-This project aims to provide a module that process a stream of raw messages
-(i.e., AIS messages) and enrich it with derived attributes such min/max, average and variance of original fields.
+This module aims to provide a Flink component that process a stream of raw messages
+(i.e., AIS Dynamic Messages) and enrich it with derived attributes such as min/max, average and variance of original fields.
 
 In addition, a stream simulator for the raw messages is developed in the context of this module, which provides a functionality to replay the original stream of raw messages by generating a simulated new Kafka Stream and taking into the account the time delay between two consecutive messages of a trajectory, furthermore, this delay can be scaled in/out by a configuration parameter.
 
 ### Contributers:
  ehab.qadah@iais.fraunhofer.de,<br/>
- michael.mock@iais.fraunhofer.de 
+ michael.mock@iais.fraunhofer.de
 
-# Output Format:
+# Output Format and Samples:
  * The output line header for the maritime use case is as the following:
- `id,timestamp,longitude,latitude,turn,speed,heading,course,status,AverageDiffTime,NumberOfPoints,LastTimestamp,LastDiffTime,MinSpeed,MinDiffTime, MaxSpeed, MaxDiffTime, MinLong,MaxLong,MinLat,MaxLat,LastDifftime, AverageSpeed,VarianceSpeed `
-  * The following four records for a trajectory (id=228037600​):
+ `id,status,turn,speed,course,heading,longitude,latitude,timestamp,AverageDiffTime,NumberOfPoints,LastDiffTime,MinSpeed,MinDiffTime,MaxSpeed,MaxDiffTime, MinLong,MaxLong,MinLat,MaxLat,LastDifftime,AverageSpeed,VarianceSpeed `
+  * The following four records of a trajectory (id=228037600​):
 ```json
-   228037600,1443650419,-4.4480133,48.157574,-127.0,9.1,511,87.6,15,0.0,1,1443650419,0,9.1,92  23372036854775807,9.1,0,-4.4480133,-4.4480133,48.157574,48.157574,0,9.1,0.0
-
-    228037600,1443650430,-4.4473267,48.15763,-127.0,9.1,511,87.2,15,5.5,2,1443650430,11,9.1,11 ,9.1,11,-4.4480133,-4.4473267,48.157574,48.15763,11,9.1,0.0
-
-    228037600,1443650439,-4.4467,48.157658,-127.0,9.1,511,86.8,15,6.666666666666667,3,14436504 39,9,9.1,9,9.1,11,-4.4480133,-4.4467,48.157574,48.157658,9,9.1,0.0
-
-    228037600,1443650450,-4.4460735,48.15768,-127.0,9.0,511,87.2,15,7.75,4,1443650450,11,9.0,9  ,9.1,11,-4.4480133,-4.4460735,48.157574,48.15768,11,9.075,0.0018749999999841
+228037600,15,-127.0,9.1,87.2,511,-4.4473267,48.15763,1443650430,0.0,1,0,9.1,9223372036854775807,9.1,0,-4.4473267,-4.4473267,48.15763,48.15763,9.1,0.0
+228037600,15,-127.0,9.1,87.6,511,-4.4480133,48.157574,1443650419,-5.5,2,11,9.1,11,9.1,0,-4.4480133,-4.4473267,48.157574,48.15763,9.1,0.0
+228037600,15,-127.0,8.9,80.7,511,-4.4417214,48.157967,1443650520,30.0,3,101,8.9,11,9.1,101,-4.4480133,-4.4417214,48.157574,48.157967,9.033333333333333,0.008888888888888826
+228037600,15,-127.0,9.0,85.4,511,-4.4448285,48.157722,1443650470,10.0,4,50,8.9,50,9.1,101,-4.4480133,-4.4417214,48.157574,48.157967,9.025,0.0068749999999999515
 ```
+
+# Output Description:
+ * We use the same order of attributes in AIS messages of NARI source with adding addition attributes computed by this module as depicted in the following table:
+
+| Attribute        | Data type           |Description  |
+ | ------------- |:-------------:|:-----|
+ |  id 	| integer          |A globally unique identifier for the moving object (usually, the MMSI of vessels).|
+|  status 	|integer          |	Navigational status
+|  turn 	|double   |	Rate of turn, right or left, 0 to 720 degrees per minute
+|  speed 	|double  |	Speed over ground in knotsint (allowed values: 0-102.2 knots)
+|  course 	|double   |	Course over ground (allowed values: 0-359.9 degrees)
+|  heading 	|integer      	|	True heading in degrees (0-359), relative to true north
+|  longitude 		|double   |	Longitude (georeference: WGS 1984)
+| latitude 		|double  |	Latitude  (georeference: WGS 1984)
+| timestamp 		|long            |   timestamp in UNIX epochs (i.e., milliseconds elapsed since 1970-01-01 00:00:00.000).
+|AverageDiffTime|long | The average of difference time between the positions message of a trajectory |
+|NumberOfPoints|int | The accumulated number of the received points |
+|LastDiffTime| double| The time difference of the current message and the last previous received message|
+|MinSpeed| double| The minimum value of speed until current message. |
+|MinDiffTime|long | The minimum value of time difference until current message.|
+| MaxSpeed| double| The maximum value of speed until current message.|
+| MaxDiffTime| double| The maximum value of time difference until current message.|
+| MinLong| double| The minimum value of longitude  until current message.|
+|MaxLong| double| The maximum value of longitude until current message.|
+|MinLat|double |The minimum value of latitude  until current message. |
+|MaxLat| double|The maximum value of latitude  until current message. |
+|AverageSpeed| double| The average of the speed|
+|VarianceSpeed|double | The variance of speed |
 # Run on Flink (locally):
  * To run the **In-Situ Processing module** on Flink cluster (locally):
     * Go the root directory of the project.
@@ -49,7 +74,7 @@ In addition, a stream simulator for the raw messages is developed in the context
 This section describes the different configurations/parameter that cusomize the execution of the In-Situ Processing module, the following are the all parameter of the mdoule along side with their description and usage, and all configs are located in the [config.properties](/src/main/resources/config.properties) file.
 
 | Parameter  Name        | Example           | Description  | Used In  |
-| ------------- |:-------------:| -----:|------------|
+| ------------- |:-------------:| :-----:|:------------:|
 | `bootstrapServers`| localhost:9092,localhost:9093| Kafka zookeeper host string| `InSituProcessingApp` & `RawStreamSimulator`|
 | `zookeeper`  | localhost:2181|A list of host/port pairs to use for establishing the initial connection to the Kafka cluster, for more details check [here](https://kafka.apache.org/documentation/#brokerconfigs) |`InSituProcessingApp` & `RawStreamSimulator`|
 | `inputStreamTopicName` | aisInsituIn|This is the topic name of the output stream of the RawStreamSimulator and the topic name of the input stream of `InSituProcessingApp`, so both components are connected through a Kafka stream |`InSituProcessingApp` & `RawStreamSimulator`|

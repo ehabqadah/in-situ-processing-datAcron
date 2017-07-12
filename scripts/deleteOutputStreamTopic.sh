@@ -8,9 +8,9 @@ prop=$(echo $line | awk -F"=" '{print $1}')
 set -- $prop
 
 
-if [ $prop == "bootstrapServers" ]; then
-  bootstrapServers=$(echo $line | awk -F"=" '{print $2}')   
-set -- $bootstrapServers
+if [ $prop == "zookeeper" ]; then
+  zookeeper=$(echo $line | awk -F"=" '{print $2}')   
+set -- $zookeeper
 fi
 
 if [ $prop == "outputStreamTopicName" ]; then
@@ -23,6 +23,7 @@ done < ../src/main/resources/config.properties
 KAFKA_DIR="/home/ehabqadah/frameworks/kafka_2.11-0.10.2.0"
 cd $KAFKA_DIR
 
-#Start the kafka consumer for output stream od in-situ processing 
-sudo ./bin/kafka-console-consumer.sh --topic $topicName --bootstrap-server $bootstrapServers --from-beginning
+#Delete the kafka topic of the  output stream of in-situ processing 
+echo  $zookeeper
 
+sudo ./bin/kafka-topics.sh --zookeeper $zookeeper --delete --topic $topicName
