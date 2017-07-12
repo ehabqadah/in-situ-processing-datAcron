@@ -37,6 +37,7 @@ public class InSituProcessingApp {
   private static Configs configs = Configs.getInstance();
 
   public static void main(String[] args) throws Exception {
+
     // set up the execution environment
     final StreamExecutionEnvironment env = new StreamExecutionEnvBuilder().build();
 
@@ -57,7 +58,9 @@ public class InSituProcessingApp {
     writeEnrichedStreamToKafka(enrichedAisMessagesStream, parsingConfig);
 
     // execute program
+
     env.execute("datAcron In-Situ Processing");
+
   }
 
   private static void writeEnrichedStreamToKafka(DataStream<AisMessage> enrichedAisMessagesStream,
@@ -89,10 +92,11 @@ public class InSituProcessingApp {
         AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),
             parsingConfig);
 
-    // assign the timestamp of the AIS messages based on their timestamps
+    // Assign the timestamp of the AIS messages based on their timestamps
     DataStream<AisMessage> aisMessagesStreamWithTimeStamp =
-        aisMessagesStream.assignTimestampsAndWatermarks(new AisMessagesTimeAssigner()).filter(
-            ais -> ais.getId().equals("228037600"));// TODO: remove debug code
+        aisMessagesStream.assignTimestampsAndWatermarks(new AisMessagesTimeAssigner());
+    // .filter(
+    // ais -> ais.getId().equals("228037600"));// debug code
 
     // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them
     // based on the message ID (MMSI for vessels)

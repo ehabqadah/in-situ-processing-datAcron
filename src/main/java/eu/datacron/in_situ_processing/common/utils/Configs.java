@@ -33,8 +33,6 @@ public class Configs implements Serializable {
 
       try {
         input = Configs.class.getResourceAsStream("/config.properties");
-
-       
         // load a properties file
         props.load(input);
         _instance = new Configs(props);

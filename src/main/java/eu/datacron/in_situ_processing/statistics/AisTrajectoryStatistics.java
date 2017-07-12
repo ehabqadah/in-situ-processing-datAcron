@@ -73,7 +73,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
   private void updateTimeAttributes(AisMessage aisMessage) {
     long newTimestamp = aisMessage.getTimestamp();
     long oldTimestamp = getLastTimestamp();
-    long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
+    long timeDiff = Math.abs(getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp);
     setLastDiffTime(timeDiff);
     setMaxDiffTime(timeDiff);
     // don't update the min for the first message
@@ -115,11 +115,11 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
   @Override
   public String toCsv(String delimiter) {
 
-    return getAverageDiffTime() + delimiter + getNumberOfPoints() + delimiter + getLastTimestamp()
-        + delimiter + getLastDiffTime() + delimiter + getMinSpeed() + delimiter + getMinDiffTime()
-        + delimiter + getMaxSpeed() + delimiter + getMaxDiffTime() + delimiter + getMinLong()
-        + delimiter + getMaxLong() + delimiter + getMinLat() + delimiter + getMaxLat() + delimiter
-        + getLastDifftime() + delimiter + getAverageSpeed() + delimiter + getVarianceSpeed();
+    return getAverageDiffTime() + delimiter + getNumberOfPoints() + delimiter + getLastDiffTime()
+        + delimiter + getMinSpeed() + delimiter + getMinDiffTime() + delimiter + getMaxSpeed()
+        + delimiter + getMaxDiffTime() + delimiter + getMinLong() + delimiter + getMaxLong()
+        + delimiter + getMinLat() + delimiter + getMaxLat() + delimiter + getAverageSpeed()
+        + delimiter + getVarianceSpeed();
   }
 
 }

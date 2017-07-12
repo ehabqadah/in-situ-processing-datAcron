@@ -17,7 +17,6 @@ public class TestApp {
   private static Configs configs = Configs.getInstance();
 
   public static void main(String[] args) throws IOException {
-    // TODO Auto-generated method stub
 
     System.out.println(configs.getStringProp("streamSourceType"));
 
