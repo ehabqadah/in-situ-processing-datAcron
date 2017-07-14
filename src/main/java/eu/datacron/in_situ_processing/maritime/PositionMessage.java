@@ -7,21 +7,21 @@ import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
 /**
  * @author ehab.qadah
  */
-public interface PositionMessage extends Serializable {
+public abstract class PositionMessage implements Serializable {
 
-  String getId();
+  abstract String getId();
 
-  void setId(String id);
+  abstract void setId(String id);
 
-  Long getTimestamp();
+  abstract Long getTimestamp();
 
-  void setTimestamp(Long value);
+  abstract void setTimestamp(Long value);
 
 
-  StatisticsWrapper getStatistics();
+  abstract StatisticsWrapper getStatistics();
 
-  void setStatistics(StatisticsWrapper value);
+  abstract void setStatistics(StatisticsWrapper value);
 
-  String toCsv(String delimiter);
+  abstract String toCsv(String delimiter);
 
 }
