@@ -17,6 +17,7 @@ package eu.datacron.in_situ_processing;
 
 import java.util.Properties;
 
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -49,18 +50,44 @@ public class InSituProcessingApp {
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
         setupKayedAisMessagesStream(env, streamSource, parsingConfig);
 
+    KeyedStream<AisMessage, Tuple> kaydAisMessagesStreamWithOrder =
+        setupOrderStream(kaydAisMessagesStream);
 
+    // kaydAisMessagesStream.print();
     DataStream<AisMessage> enrichedAisMessagesStream =
-        kaydAisMessagesStream.map(new AisStreamEnricher());
+        kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
 
-    enrichedAisMessagesStream.print();
+    //enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka
     writeEnrichedStreamToKafka(enrichedAisMessagesStream, parsingConfig);
 
     // execute program
-
     env.execute("datAcron In-Situ Processing");
 
+  }
+
+  private static KeyedStream<AisMessage, Tuple> setupOrderStream(
+      KeyedStream<AisMessage, Tuple> kaydAisMessagesStream) {
+    // KeyedStream<AisMessage, Tuple> kaydAisMessagesStreamWithOrder =
+    // kaydAisMessagesStream.countWindow(2, 2).reduce(new ReduceFunction<AisMessage>() {
+    //
+    // @Override
+    // public AisMessage reduce(AisMessage value1, AisMessage value2) throws Exception {
+    //
+    // if (value2.getTimestamp() > value1.getTimestamp()) {
+    // // value2.prevAisMessages.addAll(value1.prevAisMessages);
+    // value2.prevAisMessages.add(value1);
+    // return value2;
+    // } else {
+    //
+    // // value1.prevAisMessages.addAll(value2.prevAisMessages);
+    // value1.prevAisMessages.add(value2);
+    // return value1;
+    // }
+    // }
+    // }).keyBy("id");
+    // return kaydAisMessagesStreamWithOrder;
+    return kaydAisMessagesStream;
   }
 
   private static void writeEnrichedStreamToKafka(DataStream<AisMessage> enrichedAisMessagesStream,

@@ -1,5 +1,6 @@
 package eu.datacron.in_situ_processing.flink.utils;
 
+import org.apache.flink.api.common.ExecutionMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -19,8 +20,11 @@ public class StreamExecutionEnvBuilder {
     env = StreamExecutionEnvironment.getExecutionEnvironment();
     // configure event-time characteristics
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    
     // generate a Watermark every second
-    setAutoWatermarkInterval(1000);
+    setAutoWatermarkInterval(100);
+    env.setBufferTimeout(100);
+    env.getConfig().setExecutionMode(ExecutionMode.PIPELINED);
   }
 
   public StreamExecutionEnvBuilder setAutoWatermarkInterval(long interval) {

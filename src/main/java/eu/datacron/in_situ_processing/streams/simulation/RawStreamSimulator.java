@@ -55,8 +55,9 @@ public class RawStreamSimulator {
   private static KeyedStream<Tuple3<String, Long, String>, Tuple> setupKayedRawMessagesStream(
       final StreamExecutionEnvironment env, String parsingConfig) {
     DataStream<Tuple3<String, Long, String>> rawStream =
-        env.addSource(new FileLinesStreamSource(configs.getStringProp("aisMessagesFilePath"))).map(
-            new RawStreamMapper(parsingConfig));
+        env.addSource(
+            new FileLinesStreamSource(configs.getStringProp("aisMessagesFilePath"), parsingConfig))
+            .map(new RawStreamMapper(parsingConfig)).setParallelism(1);
 
     // assign the timestamp of the AIS messages based on their timestamps
     DataStream<Tuple3<String, Long, String>> rawStreamWithTimeStamp =

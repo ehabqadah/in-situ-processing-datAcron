@@ -56,9 +56,10 @@ public class AppUtils {
         aisMessagesStream = env.addSource(kafkaConsumer);
         break;
       case FILE:
+        
         aisMessagesStream =
-            env.addSource(new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),1))
-                .setParallelism(1).map(new CSVLineToAISMessageMapper(parsingConfig));
+            env.addSource(new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),parsingConfig))
+                .map(new CSVLineToAISMessageMapper(parsingConfig)).setParallelism(1);
 
         break;
     }
