@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mvn clean package
+mvn clean package 
 
 projectWorkDir=$(pwd)
 

@@ -9,7 +9,7 @@ import eu.datacron.in_situ_processing.maritime.PositionMessage;
 /**
  * @author ehab.qadah
  */
-public abstract class StatisticsWrapper implements Serializable {
+public abstract class StatisticsWrapper<T> implements Serializable {
 
   private static final long serialVersionUID = -8266975301330743697L;
   protected long numberOfPoints = 0;
@@ -165,7 +165,7 @@ public abstract class StatisticsWrapper implements Serializable {
    * 
    * @param positionMessage
    */
-  public abstract void processNewPosition(PositionMessage positionMessage);
+  public abstract List<T> processNewPosition(T positionMessage);
 
   public abstract String toCsv(String delimiter);
 }

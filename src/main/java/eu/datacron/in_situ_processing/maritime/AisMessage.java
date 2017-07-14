@@ -1,5 +1,8 @@
 package eu.datacron.in_situ_processing.maritime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
 
 /**
@@ -8,7 +11,7 @@ import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
  * @author ehabqadah
  *
  */
-public class AisMessage implements PositionMessage {
+public class AisMessage extends PositionMessage {
   private static final long serialVersionUID = 7555537850826069540L;
 
 
@@ -31,7 +34,10 @@ public class AisMessage implements PositionMessage {
   /** Navigational status. */
   public int status;
   /** The statistics of ais message trajectory */
-  public StatisticsWrapper trajectoryStatistics;
+  public StatisticsWrapper<AisMessage> trajectoryStatistics;
+
+  public AisMessage prevAisMessage = null;
+  public List<AisMessage> prevAisMessages = new ArrayList<AisMessage>();
 
   /**
    * Default constructor.
@@ -269,10 +275,10 @@ public class AisMessage implements PositionMessage {
   @Override
   public String toCsv(String delimiter) {
 
-    
+
     String message =
-        id + delimiter + status + delimiter + turn + delimiter + speed + delimiter
-            + course + delimiter + heading + delimiter + longitude + delimiter + latitude + delimiter
+        id + delimiter + status + delimiter + turn + delimiter + speed + delimiter + course
+            + delimiter + heading + delimiter + longitude + delimiter + latitude + delimiter
             + timestamp;
 
     if (getStatistics() != null) {

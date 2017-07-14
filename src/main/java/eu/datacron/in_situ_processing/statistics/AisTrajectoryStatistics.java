@@ -1,12 +1,16 @@
 package eu.datacron.in_situ_processing.statistics;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+// import com.google.common.collect.Lists;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.PositionMessage;
 
 /**
  * @author ehab.qadah
  */
-public class AisTrajectoryStatistics extends StatisticsWrapper {
+public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
 
   private static final long serialVersionUID = -4223639731431853133L;
 
@@ -15,20 +19,45 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
   }
 
   @Override
-  public void processNewPosition(PositionMessage positionMessage) {
-    if (positionMessage instanceof AisMessage) {
-      AisMessage aisMessage = (AisMessage) positionMessage;
+  public List<AisMessage> processNewPosition(AisMessage aisMessage) {
 
-      if (getNumberOfPoints() == 0) {
-        initFirstMessageAttributes(aisMessage);
-      }
-      // update location related attributes
-      updateLocationAttributes(aisMessage);
-      // update time related attributes
-      updateTimeAttributes(aisMessage);
-      updateSpeedAttributes(aisMessage);
-      increasePointssCount();
+    List<AisMessage> unorderedList = new ArrayList<AisMessage>();
+    List<AisMessage> result = new ArrayList<AisMessage>();
+
+
+    List<AisMessage> prevAisMessages = aisMessage.prevAisMessages;
+
+    if (prevAisMessages != null) {
+      unorderedList.addAll(prevAisMessages);
     }
+
+    unorderedList.add(aisMessage);
+    Iterator<AisMessage> sortedMessagesIterator = unorderedList.stream().sorted((msg1, msg2) -> {
+
+      return msg1.getTimestamp().compareTo(msg2.getTimestamp());
+    }).iterator();
+
+    while (sortedMessagesIterator.hasNext()) {
+      AisMessage next = sortedMessagesIterator.next();
+      processNewAisMessage(next);
+      result.add(next);
+    }
+    return result;
+  }
+
+  private void processNewAisMessage(AisMessage aisMessage) {
+
+    // System.out.println(aisMessage);
+    if (getNumberOfPoints() == 0) {
+      initFirstMessageAttributes(aisMessage);
+    }
+    // update location related attributes
+    updateLocationAttributes(aisMessage);
+    // update time related attributes
+    updateTimeAttributes(aisMessage);
+    updateSpeedAttributes(aisMessage);
+    increasePointssCount();
+
   }
 
   /**
@@ -73,7 +102,13 @@ public class AisTrajectoryStatistics extends StatisticsWrapper {
   private void updateTimeAttributes(AisMessage aisMessage) {
     long newTimestamp = aisMessage.getTimestamp();
     long oldTimestamp = getLastTimestamp();
-    long timeDiff = Math.abs(getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp);
+    long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
+
+    if (timeDiff < 0) {
+      System.out.println("**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp
+          + "timeDiff=" + timeDiff);
+    }
+
     setLastDiffTime(timeDiff);
     setMaxDiffTime(timeDiff);
     // don't update the min for the first message

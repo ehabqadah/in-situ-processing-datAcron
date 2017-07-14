@@ -84,6 +84,7 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
         }
       }
     }
+    
     return aisMessage;
   }
 
