@@ -15,7 +15,7 @@ In addition, a stream simulator for the raw messages is developed in the context
  * The output line header for the maritime use case is as the following:
  `id,status,turn,speed,course,heading,longitude,latitude,timestamp,AverageDiffTime,NumberOfPoints,LastDiffTime,MinSpeed,MinDiffTime,MaxSpeed,MaxDiffTime, MinLong,MaxLong,MinLat,MaxLat,AverageSpeed,VarianceSpeed `
   * The following four records of a trajectory (id=228037600​):
-```json
+```csv
 228037600,15,-127.0,9.1,87.2,511,-4.4473267,48.15763,1443650430,0.0,1,0,9.1,9223372036854775807,9.1,0,-4.4473267,-4.4473267,48.15763,48.15763,9.1,0.0
 228037600,15,-127.0,9.1,87.6,511,-4.4480133,48.157574,1443650419,-5.5,2,11,9.1,11,9.1,0,-4.4480133,-4.4473267,48.157574,48.15763,9.1,0.0
 228037600,15,-127.0,8.9,80.7,511,-4.4417214,48.157967,1443650520,30.0,3,101,8.9,11,9.1,101,-4.4480133,-4.4417214,48.157574,48.157967,9.033333333333333,0.008888888888888826
@@ -23,32 +23,33 @@ In addition, a stream simulator for the raw messages is developed in the context
 ```
 
 # Output Description:
- * We use the same order of attributes in AIS messages of NARI source with adding addition attributes computed by this module as depicted in the following table:
+ * We use the same order of attributes and the delimiter (i.e., ",") as the AIS messages of NARI source with adding addition attributes computed by this module as depicted in the following table:
 
 | Attribute        | Data type           |Description  |
- | ------------- |:-------------:|:-----|
- |  id 	| integer          |A globally unique identifier for the moving object (usually, the MMSI of vessels).|
-|  status 	|integer          |	Navigational status
-|  turn 	|double   |	Rate of turn, right or left, 0 to 720 degrees per minute
-|  speed 	|double  |	Speed over ground in knotsint (allowed values: 0-102.2 knots)
-|  course 	|double   |	Course over ground (allowed values: 0-359.9 degrees)
-|  heading 	|integer      	|	True heading in degrees (0-359), relative to true north
-|  longitude 		|double   |	Longitude (georeference: WGS 1984)
-| latitude 		|double  |	Latitude  (georeference: WGS 1984)
-| timestamp 		|long            |   timestamp in UNIX epochs (i.e., milliseconds elapsed since 1970-01-01 00:00:00.000).
-|AverageDiffTime|long | The average of difference time between the positions message of a trajectory |
-|NumberOfPoints|int | The accumulated number of the received points |
-|LastDiffTime| double| The time difference of the current message and the last previous received message|
-|MinSpeed| double| The minimum value of speed until current message. |
-|MinDiffTime|long | The minimum value of time difference until current message.|
-| MaxSpeed| double| The maximum value of speed until current message.|
-| MaxDiffTime| double| The maximum value of time difference until current message.|
-| MinLong| double| The minimum value of longitude  until current message.|
-|MaxLong| double| The maximum value of longitude until current message.|
-|MinLat|double |The minimum value of latitude  until current message. |
-|MaxLat| double|The maximum value of latitude  until current message. |
-|AverageSpeed| double| The average of the speed|
-|VarianceSpeed|double | The variance of speed |
+| ------------- |:-------------:|:-----|
+|  id 	        | integer       |A globally unique identifier for the moving object (usually, the MMSI of vessels).|
+|  status 	|integer        |  Navigational status
+|  turn 	|double         |  Rate of turn, right or left, 0 to 720 degrees per minute
+|  speed 	|double         |  Speed over ground in knotsint (allowed values: 0-102.2 knots)
+|  course 	|double         |  Course over ground (allowed values: 0-359.9 degrees)
+|  heading 	|integer      	|  True heading in degrees (0-359), relative to true north
+|  longitude    |double         |  Longitude (georeference: WGS 1984)
+| latitude 	|double         | Latitude  (georeference: WGS 1984)
+| timestamp 	|long           | timestamp in UNIX epochs (i.e., milliseconds elapsed since 1970-01-01 00:00:00.000).
+|AverageDiffTime|long           | The average of difference time between the positions message of a trajectory |
+|NumberOfPoints |int            | The accumulated number of the received points |
+|LastDiffTime   | double        | The time difference of the current message and the last previous received message|
+|MinSpeed       | double        | The minimum value of speed until current message. |
+|MinDiffTime    |long           | The minimum value of time difference until current message.|
+|MaxSpeed       | double        | The maximum value of speed until current message.|
+|MaxDiffTime    | double        | The maximum value of time difference until current message.|
+|MinLong        | double        | The minimum value of longitude  until current message.|
+|MaxLong        | double        | The maximum value of longitude until current message.|
+|MinLat         |double         |The minimum value of latitude  until current message. |
+|MaxLat         | double        |The maximum value of latitude  until current message. |
+|AverageSpeed   | double        | The average of the speed|
+|VarianceSpeed  |double         | The variance of speed |
+
 # Run on Flink (locally):
  * To run the **In-Situ Processing module** on Flink cluster (locally):
     * Go the root directory of the project.
