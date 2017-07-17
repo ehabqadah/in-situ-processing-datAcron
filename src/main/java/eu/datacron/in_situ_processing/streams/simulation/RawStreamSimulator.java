@@ -41,7 +41,7 @@ public class RawStreamSimulator {
         producerProps));
 
     // execute program
-    env.execute("datAcron In-Situ Processing Stream Simulator");
+    env.execute("datAcron In-Situ Processing AIS Message Stream Simulator");
   }
 
   /***
@@ -56,8 +56,8 @@ public class RawStreamSimulator {
       final StreamExecutionEnvironment env, String parsingConfig) {
     DataStream<Tuple3<String, Long, String>> rawStream =
         env.addSource(
-            new FileLinesStreamSource(configs.getStringProp("aisMessagesFilePath"), parsingConfig))
-            .map(new RawStreamMapper(parsingConfig)).setParallelism(1);
+            new FileLinesStreamSource(configs.getStringProp("aisMessagesFilePath"), parsingConfig,
+                true)).flatMap(new RawStreamMapper(parsingConfig)).setParallelism(1);
 
     // assign the timestamp of the AIS messages based on their timestamps
     DataStream<Tuple3<String, Long, String>> rawStreamWithTimeStamp =

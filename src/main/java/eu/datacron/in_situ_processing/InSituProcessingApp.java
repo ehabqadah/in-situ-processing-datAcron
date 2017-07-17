@@ -15,9 +15,13 @@ package eu.datacron.in_situ_processing;
  * the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
-import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -26,6 +30,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010.FlinkKafkaProducer010Configuration;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
+import eu.datacron.in_situ_processing.flink.utils.AisMessagesFileWriter;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
@@ -38,8 +43,9 @@ public class InSituProcessingApp {
   private static Configs configs = Configs.getInstance();
 
   public static void main(String[] args) throws Exception {
-
+    boolean writeOnlyToFile = args.length > 0;
     // set up the execution environment
+   
     final StreamExecutionEnvironment env = new StreamExecutionEnvBuilder().build();
 
     StreamSourceType streamSource =
@@ -57,9 +63,9 @@ public class InSituProcessingApp {
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
 
-    //enrichedAisMessagesStream.print();
-    // write the enriched stream to Kafka
-    writeEnrichedStreamToKafka(enrichedAisMessagesStream, parsingConfig);
+    // enrichedAisMessagesStream.print();
+    // write the enriched stream to Kafka or file
+    writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile);
 
     // execute program
     env.execute("datAcron In-Situ Processing");
@@ -90,19 +96,37 @@ public class InSituProcessingApp {
     return kaydAisMessagesStream;
   }
 
-  private static void writeEnrichedStreamToKafka(DataStream<AisMessage> enrichedAisMessagesStream,
-      String parsingConfig) {
+  private static void writeEnrichedStream(DataStream<AisMessage> enrichedAisMessagesStream,
+      String parsingConfig, boolean writeOnlyToFile) throws IOException {
 
-    Properties producerProps = AppUtils.getKafkaProducerProperties();
-    String outputStreamTopic = configs.getStringProp("outputStreamTopicName");
+    if (writeOnlyToFile) {
+      String outputFile = configs.getStringProp("outputFilePath");
 
-    FlinkKafkaProducer010Configuration<AisMessage> myProducerConfig =
-        FlinkKafkaProducer010.writeToKafkaWithTimestamps(enrichedAisMessagesStream,
-            outputStreamTopic, new AisMessageCsvSchema(parsingConfig), producerProps);
 
-    // the following is necessary for at-least-once delivery guarantee
-    myProducerConfig.setLogFailuresOnly(false); // "false" by default
-    myProducerConfig.setFlushOnCheckpoint(true); // "false" by default
+      if (!new File(outputFile).isFile()) {
+        Path p = Paths.get(outputFile);
+        Files.createFile(p);
+
+      }
+      // write to file
+      enrichedAisMessagesStream.addSink(
+          new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)))
+          .setParallelism(1);
+    } else {
+      // Write to Kafka
+      Properties producerProps = AppUtils.getKafkaProducerProperties();
+      String outputStreamTopic = configs.getStringProp("outputStreamTopicName");
+
+      FlinkKafkaProducer010Configuration<AisMessage> myProducerConfig =
+          FlinkKafkaProducer010.writeToKafkaWithTimestamps(enrichedAisMessagesStream,
+              outputStreamTopic, new AisMessageCsvSchema(parsingConfig), producerProps);
+
+      // the following is necessary for at-least-once delivery guarantee
+      myProducerConfig.setLogFailuresOnly(false); // "false" by default
+      myProducerConfig.setFlushOnCheckpoint(true); // "false" by default
+
+    }
+
   }
 
   /***
