@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * File lines stream source function that read the message from text file
@@ -16,28 +17,38 @@ import org.json.JSONObject;
 public class FileLinesStreamSource implements SourceFunction<String> {
 
   private static final long serialVersionUID = 2174904787118597072L;
-  static Logger logger = Logger.getLogger(FileLinesStreamSource.class.getName());
+  static Logger logger = LoggerFactory.getLogger(FileLinesStreamSource.class.getName());
   private String dataFilePath;
 
   boolean running = true;
   int i = 0;
   private int timeStampIndex;
   private String delimiter;
+  boolean warmupWait = false;
 
   public FileLinesStreamSource() {}
 
   public FileLinesStreamSource(String dataFilePath, String parsingJsonConfigsStr) {
+    initFields(dataFilePath, parsingJsonConfigsStr, warmupWait);
+  }
+
+  public FileLinesStreamSource(String dataFilePath, String parsingJsonConfigsStr, boolean warmupWait) {
+    initFields(dataFilePath, parsingJsonConfigsStr, false);
+  }
+
+  private void initFields(String dataFilePath, String parsingJsonConfigsStr, boolean warmupWait) {
     this.dataFilePath = dataFilePath;
     JSONObject parsingJsonObject = new JSONObject(parsingJsonConfigsStr);
     this.timeStampIndex = parsingJsonObject.getInt("timestamp");
     this.delimiter = parsingJsonObject.getString("delimiter");
+    this.warmupWait = warmupWait;
   }
 
 
   @Override
   public void run(SourceContext<String> ctx) throws Exception {
 
-    Thread.sleep(10000);
+    Thread.sleep(1000);
     long oldTimeStamp = 0;
     while (running) {
 
@@ -45,9 +56,18 @@ public class FileLinesStreamSource implements SourceFunction<String> {
         String messageLine;
         while ((messageLine = br.readLine()) != null) {
           i++;
-
-          long newTime = Long.parseLong(messageLine.split(delimiter)[timeStampIndex]);
+          long newTime = 0;
+          try {
+            newTime = Long.parseLong(messageLine.split(delimiter)[timeStampIndex]);
+          } catch (NumberFormatException e) {
+            logger.error(e.getMessage() + " for line:" + messageLine);
+          }
           ctx.collectWithTimestamp(messageLine, newTime);
+
+          if (i == 1 && warmupWait) {
+            // warm up waiting time
+            Thread.sleep(300000);
+          }
           long delay = 0;
           if (oldTimeStamp != 0) {
             // System.out.println(delay);
@@ -59,10 +79,6 @@ public class FileLinesStreamSource implements SourceFunction<String> {
               // Thread.sleep(delay);
             }
           }
-
-//          if (i % 1000 == 0) {
-//            break;
-//          }
         }
       } catch (Exception e) {
 
@@ -70,7 +86,7 @@ public class FileLinesStreamSource implements SourceFunction<String> {
         break;
       }
 
-      Thread.sleep(1000000);
+      Thread.sleep(600000);
       running = false;
     }
   }
