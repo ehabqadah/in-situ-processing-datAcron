@@ -22,8 +22,8 @@ public class StreamExecutionEnvBuilder {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
     
     // generate a Watermark every second
-    setAutoWatermarkInterval(100);
-    env.setBufferTimeout(100);
+    setAutoWatermarkInterval(1000);
+    env.setBufferTimeout(1000);
     env.getConfig().setExecutionMode(ExecutionMode.PIPELINED);
   }
 
