@@ -13,7 +13,7 @@ if [ $prop == "bootstrapServers" ]; then
 set -- $bootstrapServers
 fi
 
-if [ $prop == "outputStreamTopicName" ]; then
+if [ $prop == "inputStreamTopicName" ]; then
   topicName=$(echo $line | awk -F"=" '{print $2}')   
 set -- $topicName
 fi
