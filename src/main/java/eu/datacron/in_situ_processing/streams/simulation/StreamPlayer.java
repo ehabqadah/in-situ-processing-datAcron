@@ -13,7 +13,8 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible to simulate/replay the raw message stream by delay sending some records
@@ -25,7 +26,7 @@ public class StreamPlayer extends
     RichMapFunction<Tuple3<String, Long, String>, Tuple3<String, Long, String>> {
 
   private static final long serialVersionUID = -8094032551260660913L;
-  private static final Logger logger = Logger.getLogger(StreamPlayer.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(RawStreamMapper.class.getName());
   // --------------------------------------------------------------------------------------------
   // Fields
   // --------------------------------------------------------------------------------------------
@@ -48,9 +49,14 @@ public class StreamPlayer extends
   }
 
   @Override
-  public Tuple3<String, Long, String> map(Tuple3<String, Long, String> rawMessageTuple)
-      throws Exception {
-    long delay = getSimulatedTimeDelayBetweenRawMessages(rawMessageTuple);
+  public Tuple3<String, Long, String> map(Tuple3<String, Long, String> rawMessageTuple) {
+    long delay;
+    try {
+      delay = getSimulatedTimeDelayBetweenRawMessages(rawMessageTuple);
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      delay = 0;
+    }
     // write the message to Kafka after the delay
     writeRawMessageWithDelay(rawMessageTuple, delay);
     return rawMessageTuple;
@@ -73,6 +79,11 @@ public class StreamPlayer extends
         lastTimestamp.value() == null ? currentPointTimestamp : lastTimestamp.value();
     lastTimestamp.update(currentPointTimestamp);
     long delay = (long) ((currentPointTimestamp - lastPointTimeStamp) * simulationWaitingScale);
+
+    if (delay < 0) {
+      logger.error("negative delay" + delay + "for " + rawMessageTuple + " old timestamp"
+          + lastTimestamp);
+    }
     return delay;
   }
 
@@ -84,25 +95,36 @@ public class StreamPlayer extends
     this.producer = new KafkaProducer<String, String>(kafkaProps);
   }
 
-  public void writeRawMessageWithDelay(Tuple3<String, Long, String> rawMessageTuple, long delay) {
+  public void writeRawMessageWithDelay(Tuple3<String, Long, String> rawMessageTuple, long writeDelay) {
 
-    long writeDelay = Math.abs(delay);
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
+    if (writeDelay == 0) {
+      // send the message to Kafka with creating thread
+      writeMessageToKafka(rawMessageTuple);
+    }
+    try {
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
 
-        if (writeDelay > 0) {
-          try {
-            Thread.sleep((writeDelay));
-          } catch (InterruptedException e) {
-            System.err.println(e);
+          if (writeDelay > 0) {
+            try {
+              Thread.sleep((writeDelay));
+            } catch (InterruptedException e) {
+              logger.error(e.getMessage());
+            }
           }
-        }
-        // send the message to Kafka
-        writeMessageToKafka(rawMessageTuple);
-      }
 
-    }).run();
+          // send the message to Kafka
+          writeMessageToKafka(rawMessageTuple);
+        }
+
+      }).run();
+    } catch (Exception e) {
+
+      logger.error(e.getMessage());
+      // send the message to Kafka anyway
+      writeMessageToKafka(rawMessageTuple);
+    }
 
 
   }

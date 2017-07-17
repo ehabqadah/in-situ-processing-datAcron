@@ -29,11 +29,11 @@ public class FileLinesStreamSource implements SourceFunction<String> {
   public FileLinesStreamSource() {}
 
   public FileLinesStreamSource(String dataFilePath, String parsingJsonConfigsStr) {
-    initFields(dataFilePath, parsingJsonConfigsStr, warmupWait);
+    initFields(dataFilePath, parsingJsonConfigsStr, false);
   }
 
   public FileLinesStreamSource(String dataFilePath, String parsingJsonConfigsStr, boolean warmupWait) {
-    initFields(dataFilePath, parsingJsonConfigsStr, false);
+    initFields(dataFilePath, parsingJsonConfigsStr, warmupWait);
   }
 
   private void initFields(String dataFilePath, String parsingJsonConfigsStr, boolean warmupWait) {
@@ -66,7 +66,7 @@ public class FileLinesStreamSource implements SourceFunction<String> {
 
           if (i == 1 && warmupWait) {
             // warm up waiting time
-            Thread.sleep(300000);
+            Thread.sleep(240000);
           }
           long delay = 0;
           if (oldTimeStamp != 0) {
