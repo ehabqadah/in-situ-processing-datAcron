@@ -100,6 +100,7 @@ public class StreamPlayer extends
     if (writeDelay == 0) {
       // send the message to Kafka with creating thread
       writeMessageToKafka(rawMessageTuple);
+      return;
     }
     try {
       new Thread(new Runnable() {

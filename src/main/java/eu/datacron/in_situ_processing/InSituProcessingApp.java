@@ -45,7 +45,7 @@ public class InSituProcessingApp {
   public static void main(String[] args) throws Exception {
     boolean writeOnlyToFile = args.length > 0;
     // set up the execution environment
-   
+
     final StreamExecutionEnvironment env = new StreamExecutionEnvBuilder().build();
 
     StreamSourceType streamSource =
@@ -63,7 +63,7 @@ public class InSituProcessingApp {
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
 
-    // enrichedAisMessagesStream.print();
+   // enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka or file
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile);
 

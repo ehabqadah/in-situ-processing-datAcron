@@ -13,7 +13,7 @@ In addition, a stream simulator for the raw messages is developed in the context
 
 # Output Format and Samples:
  * The output line header for the maritime use case is as the following:
- `id,status,turn,speed,course,heading,longitude,latitude,timestamp,AverageDiffTime,NumberOfPoints,LastDiffTime,MinSpeed,MinDiffTime,MaxSpeed,MaxDiffTime, MinLong,MaxLong,MinLat,MaxLat,AverageSpeed,VarianceSpeed `
+ `id,status,turn,speed,course,heading,longitude,latitude,timestamp,AverageDiffTime,NumberOfPoints,LastDiffTime,MinSpeed,MinDiffTime,MaxSpeed,MaxDiffTime, MinLong,MaxLong,MinLat,MaxLat,AverageSpeed,VarianceSpeed`
   * The following four records of a trajectory (id=228037600​):
 ```csv
 228037600,15,-127.0,9.1,87.2,511,-4.4473267,48.15763,1443650430,0.0,1,0,9.1,9223372036854775807,9.1,0,-4.4473267,-4.4473267,48.15763,48.15763,9.1,0.0
