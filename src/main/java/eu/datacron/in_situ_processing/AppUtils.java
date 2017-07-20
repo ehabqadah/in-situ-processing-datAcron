@@ -6,17 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import org.apache.flink.streaming.util.serialization.SerializationSchema;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.CSVLineToAISMessageMapper;
-import eu.datacron.in_situ_processing.flink.utils.FileLinesStreamSource;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
 
@@ -57,10 +53,11 @@ public class AppUtils {
       case FILE:
 
         aisMessagesStream =
-            env.addSource(
-                new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),
-                    parsingConfig)).flatMap(new CSVLineToAISMessageMapper(parsingConfig))
-                .setParallelism(1);
+        // env.addSource(
+        // new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),
+        // parsingConfig)).setParallelism(1)
+            env.readTextFile(configs.getStringProp(filePathOrTopicProperty))
+                .flatMap(new CSVLineToAISMessageMapper(parsingConfig));
 
         break;
     }

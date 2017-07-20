@@ -25,7 +25,7 @@ public abstract class StatisticsWrapper<T> implements Serializable {
   protected double maxLong;
   protected double minLat;
   protected double maxLat;
-  protected List<Double> prevSpeeds = new ArrayList<Double>();
+  private List<Double> prevSpeeds = new ArrayList<Double>();
 
   /** Average of attributes **/
   public double averageSpeed;
@@ -164,8 +164,17 @@ public abstract class StatisticsWrapper<T> implements Serializable {
    * Process new incoming position message to update the statisticss
    * 
    * @param positionMessage
+   * @throws Exception 
    */
-  public abstract List<T> processNewPosition(T positionMessage);
+  public abstract List<T> processNewPosition(T positionMessage) throws Exception;
 
   public abstract String toCsv(String delimiter);
+
+  public List<Double> getPrevSpeeds() {
+    return prevSpeeds;
+  }
+
+  public void setPrevSpeeds(List<Double> prevSpeeds) {
+    this.prevSpeeds = prevSpeeds;
+  }
 }

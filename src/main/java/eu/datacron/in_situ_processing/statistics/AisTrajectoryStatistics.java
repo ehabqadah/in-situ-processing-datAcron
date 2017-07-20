@@ -3,6 +3,12 @@ package eu.datacron.in_situ_processing.statistics;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.flink.api.common.ExecutionMode;
+
+
+
+
 // import com.google.common.collect.Lists;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.PositionMessage;
@@ -19,7 +25,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
   }
 
   @Override
-  public List<AisMessage> processNewPosition(AisMessage aisMessage) {
+  public List<AisMessage> processNewPosition(AisMessage aisMessage) throws Exception {
 
     List<AisMessage> unorderedList = new ArrayList<AisMessage>();
     List<AisMessage> result = new ArrayList<AisMessage>();
@@ -45,7 +51,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     return result;
   }
 
-  private void processNewAisMessage(AisMessage aisMessage) {
+  private void processNewAisMessage(AisMessage aisMessage) throws Exception {
 
     // System.out.println(aisMessage);
     if (getNumberOfPoints() == 0) {
@@ -90,22 +96,24 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     double newAverageSpeed = aggreagtedSpeedSum / pointsCount;
     setAverageSpeed(newAverageSpeed);
     // compute the speed variance
-    this.prevSpeeds.add(speed);
+    this.getPrevSpeeds().add(speed);
     double sumOfSquareMeanDiff = 0.0;
-    for (double prevSpeed : this.prevSpeeds) {
+    for (double prevSpeed : this.getPrevSpeeds()) {
       sumOfSquareMeanDiff += Math.pow(prevSpeed - newAverageSpeed, 2);
     }
     // set variance of speed
     setVarianceSpeed(sumOfSquareMeanDiff / pointsCount);
   }
 
-  private void updateTimeAttributes(AisMessage aisMessage) {
+  private void updateTimeAttributes(AisMessage aisMessage) throws Exception {
     long newTimestamp = aisMessage.getTimestamp();
     long oldTimestamp = getLastTimestamp();
     long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
 
     if (timeDiff < 0) {
       System.out.println("**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp
+          + "timeDiff=" + timeDiff);
+      throw new Exception("**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp
           + "timeDiff=" + timeDiff);
     }
 

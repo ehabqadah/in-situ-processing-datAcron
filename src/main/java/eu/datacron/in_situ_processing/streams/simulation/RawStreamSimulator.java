@@ -7,6 +7,8 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.util.Collector;
 
 import eu.datacron.in_situ_processing.AppUtils;
 import eu.datacron.in_situ_processing.common.utils.Configs;
@@ -19,6 +21,17 @@ import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
  * @author ehab.qadah
  */
 public class RawStreamSimulator {
+
+  public static final class RawMessagesSorter extends
+      ProcessFunction<Tuple3<String, Long, String>, Tuple3<String, Long, String>> {
+    @Override
+    public void processElement(Tuple3<String, Long, String> arg0,
+        ProcessFunction<Tuple3<String, Long, String>, Tuple3<String, Long, String>>.Context arg1,
+        Collector<Tuple3<String, Long, String>> arg2) throws Exception {
+      // TODO Auto-generated method stub
+
+    }
+  }
 
   private static Configs configs = Configs.getInstance();
 
@@ -55,9 +68,8 @@ public class RawStreamSimulator {
   private static KeyedStream<Tuple3<String, Long, String>, Tuple> setupKayedRawMessagesStream(
       final StreamExecutionEnvironment env, String parsingConfig) {
     DataStream<Tuple3<String, Long, String>> rawStream =
-        env.addSource(
-            new FileLinesStreamSource(configs.getStringProp("aisMessagesFilePath"), parsingConfig,
-                true)).flatMap(new RawStreamMapper(parsingConfig)).setParallelism(1);
+        env.readTextFile(configs.getStringProp("aisMessagesFilePath")).flatMap(
+            new RawStreamMapper(parsingConfig));
 
     // assign the timestamp of the AIS messages based on their timestamps
     DataStream<Tuple3<String, Long, String>> rawStreamWithTimeStamp =
@@ -66,7 +78,7 @@ public class RawStreamSimulator {
     // Construct the keyed stream (i.e., trajectories stream) of the raw messages by grouping them
     // based on the message ID (MMSI for vessels)
     KeyedStream<Tuple3<String, Long, String>, Tuple> kaydAisMessagesStream =
-        rawStreamWithTimeStamp.keyBy(0);
+        rawStreamWithTimeStamp.keyBy(0).process(new RawMessagesSorter()).keyBy(0);
     return kaydAisMessagesStream;
   }
 

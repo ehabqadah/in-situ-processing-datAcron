@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -34,7 +35,8 @@ import eu.datacron.in_situ_processing.flink.utils.AisMessagesFileWriter;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
-import eu.datacron.in_situ_processing.maritime.streams.operators.AisMessagesTimeAssigner;
+import eu.datacron.in_situ_processing.maritime.streams.operators.AISMessagesTimeAssigner;
+import eu.datacron.in_situ_processing.maritime.streams.operators.AisMessagesStreamSorter;
 import eu.datacron.in_situ_processing.maritime.streams.operators.AisStreamEnricher;
 
 
@@ -44,6 +46,7 @@ public class InSituProcessingApp {
 
   public static void main(String[] args) throws Exception {
     boolean writeOnlyToFile = args.length > 0;
+
     // set up the execution environment
 
     final StreamExecutionEnvironment env = new StreamExecutionEnvBuilder().build();
@@ -63,36 +66,17 @@ public class InSituProcessingApp {
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
 
-   // enrichedAisMessagesStream.print();
+    // enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka or file
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile);
 
     // execute program
-    env.execute("datAcron In-Situ Processing");
+    env.execute("datAcron In-Situ Processing 1.0.3");
 
   }
 
   private static KeyedStream<AisMessage, Tuple> setupOrderStream(
       KeyedStream<AisMessage, Tuple> kaydAisMessagesStream) {
-    // KeyedStream<AisMessage, Tuple> kaydAisMessagesStreamWithOrder =
-    // kaydAisMessagesStream.countWindow(2, 2).reduce(new ReduceFunction<AisMessage>() {
-    //
-    // @Override
-    // public AisMessage reduce(AisMessage value1, AisMessage value2) throws Exception {
-    //
-    // if (value2.getTimestamp() > value1.getTimestamp()) {
-    // // value2.prevAisMessages.addAll(value1.prevAisMessages);
-    // value2.prevAisMessages.add(value1);
-    // return value2;
-    // } else {
-    //
-    // // value1.prevAisMessages.addAll(value2.prevAisMessages);
-    // value1.prevAisMessages.add(value2);
-    // return value1;
-    // }
-    // }
-    // }).keyBy("id");
-    // return kaydAisMessagesStreamWithOrder;
     return kaydAisMessagesStream;
   }
 
@@ -103,15 +87,16 @@ public class InSituProcessingApp {
       String outputFile = configs.getStringProp("outputFilePath");
 
 
-      if (!new File(outputFile).isFile()) {
-        Path p = Paths.get(outputFile);
-        Files.createFile(p);
-
-      }
+//      if (!new File(outputFile).isFile()) {
+//        Path p = Paths.get(outputFile);
+//        Files.createFile(p);
+//
+//      }
       // write to file
-      enrichedAisMessagesStream.addSink(
-          new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)))
-          .setParallelism(1);
+      // enrichedAisMessagesStream.addSink(
+      // new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)));
+
+      enrichedAisMessagesStream.writeAsText(outputFile, WriteMode.OVERWRITE);
     } else {
       // Write to Kafka
       Properties producerProps = AppUtils.getKafkaProducerProperties();
@@ -145,14 +130,14 @@ public class InSituProcessingApp {
 
     // Assign the timestamp of the AIS messages based on their timestamps
     DataStream<AisMessage> aisMessagesStreamWithTimeStamp =
-        aisMessagesStream.assignTimestampsAndWatermarks(new AisMessagesTimeAssigner());
-    // .filter(
-    // ais -> ais.getId().equals("228037600"));// debug code
+        aisMessagesStream.assignTimestampsAndWatermarks(new AISMessagesTimeAssigner());
+    // aisMessagesStream.print();
 
     // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them
     // based on the message ID (MMSI for vessels)
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
-        aisMessagesStreamWithTimeStamp.keyBy("id");
+        aisMessagesStreamWithTimeStamp.keyBy("id").process(new AisMessagesStreamSorter())
+            .keyBy("id");
     return kaydAisMessagesStream;
   }
 

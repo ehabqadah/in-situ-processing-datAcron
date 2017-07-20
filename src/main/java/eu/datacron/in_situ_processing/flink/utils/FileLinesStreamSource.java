@@ -74,10 +74,9 @@ public class FileLinesStreamSource implements SourceFunction<String> {
             delay = newTime - oldTimeStamp;
           }
           oldTimeStamp = newTime;
-          if (delay > 0) {
-            if (delay > 0) {
-              // Thread.sleep(delay);
-            }
+          if (delay < 0) {
+            System.out.println("nagative delay" + delay + " ---- i " + i + "---- line"
+                + messageLine);
           }
         }
       } catch (Exception e) {
