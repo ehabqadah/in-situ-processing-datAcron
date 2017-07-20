@@ -6,9 +6,6 @@ import java.util.List;
 
 import org.apache.flink.api.common.ExecutionMode;
 
-
-
-
 // import com.google.common.collect.Lists;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.PositionMessage;
@@ -81,6 +78,13 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     this.minSpeed = aisMessage.getSpeed();
     this.maxSpeed = aisMessage.getSpeed();
 
+    this.minTurn = aisMessage.getTurn();
+    this.maxTurn = aisMessage.getTurn();
+
+    this.minHeading = aisMessage.getHeading();
+    this.maxHeading = aisMessage.getHeading();
+
+
     this.lastTimestamp = aisMessage.getTimestamp();
 
   }
@@ -139,6 +143,12 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     setMinLat(aisMessage.getLatitude());
     setMaxLong(aisMessage.getLongitude());
     setMinLong(aisMessage.getLongitude());
+
+    setMaxHeading(aisMessage.getHeading());
+    setMinHeading(aisMessage.getHeading());
+
+    setMaxTurn(aisMessage.getTurn());
+    setMinTurn(aisMessage.getTurn());
   }
 
 
@@ -158,11 +168,12 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
   @Override
   public String toCsv(String delimiter) {
 
-    return getAverageDiffTime() + delimiter + getNumberOfPoints() + delimiter + getLastDiffTime()
-        + delimiter + getMinSpeed() + delimiter + getMinDiffTime() + delimiter + getMaxSpeed()
-        + delimiter + getMaxDiffTime() + delimiter + getMinLong() + delimiter + getMaxLong()
-        + delimiter + getMinLat() + delimiter + getMaxLat() + delimiter + getAverageSpeed()
-        + delimiter + getVarianceSpeed();
+    return getNumberOfPoints() + delimiter + getAverageDiffTime() + delimiter + getLastDiffTime()
+        + delimiter + getMinDiffTime() + delimiter + getMaxDiffTime() + delimiter + getMaxSpeed()
+        + delimiter + getMinSpeed() + delimiter + getAverageSpeed() + delimiter
+        + getVarianceSpeed() + delimiter + getMinLong() + delimiter + getMaxLong() + delimiter
+        + getMinLat() + delimiter + getMaxLat() + delimiter + getMinturn() + delimiter
+        + getMaxturn() + delimiter + getMinHeading() + delimiter + getMaxHeading();
   }
 
 }

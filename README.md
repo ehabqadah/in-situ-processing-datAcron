@@ -37,8 +37,8 @@ In addition, a stream simulator for the raw messages is developed in the context
 | latitude 	|double         | Latitude  (georeference: WGS 1984)
 | timestamp 	|long           | timestamp in UNIX epochs (i.e., milliseconds elapsed since 1970-01-01 00:00:00.000).
 |AverageDiffTime|long           | The average of difference time between the positions message of a trajectory |
-|NumberOfPoints |int            | The accumulated number of the received points |
-|LastDiffTime   | double        | The time difference of the current message and the last previous received message|
+|NumberOfPoints |long            | The accumulated number of the received points |
+|LastDiffTime   | long        | The time difference of the current message and the last previous received message|
 |MinSpeed       | double        | The minimum value of speed until current message. |
 |MinDiffTime    |long           | The minimum value of time difference until current message.|
 |MaxSpeed       | double        | The maximum value of speed until current message.|

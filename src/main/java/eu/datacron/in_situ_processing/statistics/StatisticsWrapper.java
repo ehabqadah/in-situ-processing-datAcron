@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.datacron.in_situ_processing.maritime.PositionMessage;
-
 /**
  * @author ehab.qadah
  */
@@ -21,10 +19,16 @@ public abstract class StatisticsWrapper<T> implements Serializable {
   protected double maxSpeed;
   protected long minDiffTime = Long.MAX_VALUE;// min diff time can not be set as zero initially
   protected long maxDiffTime;
+  protected int minHeading;
+  protected double minTurn;
+
   protected double minLong;
   protected double maxLong;
   protected double minLat;
   protected double maxLat;
+  protected int maxHeading;
+  protected double maxTurn;
+
   private List<Double> prevSpeeds = new ArrayList<Double>();
 
   /** Average of attributes **/
@@ -144,27 +148,56 @@ public abstract class StatisticsWrapper<T> implements Serializable {
     this.maxLat = Math.max(this.maxLat, maxLat);
   }
 
-  public long getLastDifftime() {
-    return lastDifftime;
+  public void setMinHeading(int minHeading) {
+    this.minHeading = Math.min(this.minHeading, minHeading);
   }
 
+  public void setMinTurn(double minturn) {
+    this.minTurn = Math.min(this.minTurn, minturn);
+  }
+  public void setMaxHeading(int maxHeading) {
+    this.maxHeading = Math.max(this.maxHeading, maxHeading);
+  }
+  
+  public void setMaxTurn(double maxturn) {
+    this.maxTurn = Math.max(this.maxTurn, maxturn);
+  }
   public void setLastDifftime(long lastDifftime) {
     this.lastDifftime = lastDifftime;
+  }
+
+  public void setAverageSpeed(double averageSpeed) {
+    this.averageSpeed = averageSpeed;
+  }
+  
+  public int getMinHeading() {
+    return minHeading;
+  }
+
+  public double getMinturn() {
+    return minTurn;
+  }
+
+  public int getMaxHeading() {
+    return maxHeading;
+  }
+  public double getMaxturn() {
+    return maxTurn;
+  }
+
+  public long getLastDifftime() {
+    return lastDifftime;
   }
 
   public double getAverageSpeed() {
     return averageSpeed;
   }
 
-  public void setAverageSpeed(double averageSpeed) {
-    this.averageSpeed = averageSpeed;
-  }
-
   /**
    * Process new incoming position message to update the statisticss
    * 
    * @param positionMessage
-   * @throws Exception 
+   * @throws Exception
    */
   public abstract List<T> processNewPosition(T positionMessage) throws Exception;
 
