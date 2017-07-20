@@ -33,6 +33,9 @@ public class AisMessage extends PositionMessage {
   public double course;
   /** Navigational status. */
   public int status;
+
+  /** Error Message Flag **/
+  private String msgErrorFlag = "";
   /** The statistics of ais message trajectory */
   public StatisticsWrapper<AisMessage> trajectoryStatistics;
 
@@ -246,6 +249,15 @@ public class AisMessage extends PositionMessage {
     this.status = value;
   }
 
+  public String getMsgErrorFlag() {
+    return msgErrorFlag;
+  }
+
+  public void setMsgErrorFlag(String msgErrorFlag) {
+    this.msgErrorFlag = msgErrorFlag;
+  }
+
+
   @Override
   public String toString() {
     String message =
@@ -277,9 +289,9 @@ public class AisMessage extends PositionMessage {
 
 
     String message =
-        id + delimiter + status + delimiter + turn + delimiter + speed + delimiter + course
-            + delimiter + heading + delimiter + longitude + delimiter + latitude + delimiter
-            + timestamp;
+        timestamp + delimiter + id + delimiter + longitude + delimiter + latitude + delimiter
+            + speed + delimiter + heading + delimiter + msgErrorFlag + delimiter + course
+            + delimiter + status + delimiter + turn;
 
     if (getStatistics() != null) {
 

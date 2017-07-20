@@ -15,11 +15,7 @@ package eu.datacron.in_situ_processing;
  * the License.
  */
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.flink.api.java.tuple.Tuple;
@@ -31,7 +27,6 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010.FlinkKafkaProducer010Configuration;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
-import eu.datacron.in_situ_processing.flink.utils.AisMessagesFileWriter;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
@@ -48,7 +43,6 @@ public class InSituProcessingApp {
     boolean writeOnlyToFile = args.length > 0;
 
     // set up the execution environment
-
     final StreamExecutionEnvironment env = new StreamExecutionEnvBuilder().build();
 
     StreamSourceType streamSource =
@@ -66,7 +60,7 @@ public class InSituProcessingApp {
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
 
-    // enrichedAisMessagesStream.print();
+    enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka or file
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile);
 
@@ -87,11 +81,11 @@ public class InSituProcessingApp {
       String outputFile = configs.getStringProp("outputFilePath");
 
 
-//      if (!new File(outputFile).isFile()) {
-//        Path p = Paths.get(outputFile);
-//        Files.createFile(p);
-//
-//      }
+      // if (!new File(outputFile).isFile()) {
+      // Path p = Paths.get(outputFile);
+      // Files.createFile(p);
+      //
+      // }
       // write to file
       // enrichedAisMessagesStream.addSink(
       // new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)));
@@ -155,8 +149,6 @@ public class InSituProcessingApp {
         return "inputStreamTopicName";
       default:
         return null;
-
-
     }
 
   }

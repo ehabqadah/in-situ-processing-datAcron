@@ -20,7 +20,8 @@ public class StreamExecutionEnvBuilder {
     env = StreamExecutionEnvironment.getExecutionEnvironment();
     // configure event-time characteristics
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-    
+    // enable check pointing every 3 minutes
+    env.enableCheckpointing(3 * 60 * 1000);
     // generate a Watermark every second
     setAutoWatermarkInterval(1000);
     env.setBufferTimeout(1000);
