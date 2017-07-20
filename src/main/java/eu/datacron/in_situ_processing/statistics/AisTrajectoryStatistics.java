@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.flink.api.common.ExecutionMode;
 
+
+
 // import com.google.common.collect.Lists;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.PositionMessage;
@@ -164,6 +166,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
         + ", getAverageSpeed()=" + getAverageSpeed() + ", getVarianceSpeed()=" + getVarianceSpeed()
         + "] \n";
   }
+  
 
   @Override
   public String toCsv(String delimiter) {

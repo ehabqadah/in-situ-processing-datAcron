@@ -290,8 +290,8 @@ public class AisMessage extends PositionMessage {
 
     String message =
         timestamp + delimiter + id + delimiter + longitude + delimiter + latitude + delimiter
-            + speed + delimiter + heading + delimiter + msgErrorFlag + delimiter + course
-            + delimiter + status + delimiter + turn;
+            + speed + delimiter + heading + delimiter + msgErrorFlag + delimiter + turn + delimiter
+            + course + delimiter + status;
 
     if (getStatistics() != null) {
 
