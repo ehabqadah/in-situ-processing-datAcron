@@ -260,6 +260,8 @@ public class AisMessage extends PositionMessage {
 
   @Override
   public String toString() {
+
+    // return toCsv(",");
     String message =
         "AISMessage [timestamp=" + timestamp + ", id=" + id + ", longitude=" + longitude
             + ", latitude=" + latitude + ", turn=" + turn + ", speed=" + speed + ", heading="

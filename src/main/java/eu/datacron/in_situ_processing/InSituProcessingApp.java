@@ -65,7 +65,7 @@ public class InSituProcessingApp {
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile);
 
     // execute program
-    env.execute("datAcron In-Situ Processing 1.0.3");
+    env.execute("datAcron In-Situ Processing "+AppUtils.getAppVersion());
 
   }
 

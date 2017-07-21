@@ -14,7 +14,7 @@
 
 	<groupId>eu.datacron</groupId>
 	<artifactId>in-situ-processing</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<packaging>jar</packaging>
 
 	<name>in-situ processing datAcron</name>
@@ -311,6 +311,19 @@
 				<configuration>
 					<source>1.8</source> <!-- If you want to use Java 8, change this to "1.8" -->
 					<target>1.8</target> <!-- If you want to use Java 8, change this to "1.8" -->
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
