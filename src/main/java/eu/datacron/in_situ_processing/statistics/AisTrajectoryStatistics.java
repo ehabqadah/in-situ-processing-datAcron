@@ -86,7 +86,6 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     this.minHeading = aisMessage.getHeading();
     this.maxHeading = aisMessage.getHeading();
 
-
     this.lastTimestamp = aisMessage.getTimestamp();
 
   }
@@ -145,10 +144,8 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     setMinLat(aisMessage.getLatitude());
     setMaxLong(aisMessage.getLongitude());
     setMinLong(aisMessage.getLongitude());
-
     setMaxHeading(aisMessage.getHeading());
     setMinHeading(aisMessage.getHeading());
-
     setMaxTurn(aisMessage.getTurn());
     setMinTurn(aisMessage.getTurn());
   }
@@ -167,7 +164,6 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
         + "] \n";
   }
   
-
   @Override
   public String toCsv(String delimiter) {
 

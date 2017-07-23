@@ -107,12 +107,13 @@ public class AppUtils {
   }
 
   /**
-   * Get the app version based on the maven artifact version 
+   * Get the app version based on the maven artifact version
+   * 
    * @return
    */
- public static  String getAppVersion(){
-    
-    
-   return  AppUtils.class.getPackage().getImplementationVersion();
+  public static String getAppVersion() {
+
+
+    return AppUtils.class.getPackage().getImplementationVersion();
   }
 }

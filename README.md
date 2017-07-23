@@ -1,23 +1,21 @@
 # In-Situ Processing - datAcron
 
-This is a component within the [datAcron EU](http://www.datacron-project.eu/) project.
-
-This module aims to provide a Flink component that process a stream of raw messages
-(i.e., AIS Dynamic Messages) and enrich it with derived attributes such as min/max, average and variance of original fields.
-
+This is a component within the [datAcron EU](http://www.datacron-project.eu/) project, it aims to provide a Flink component that process a stream of raw messages (i.e., AIS Dynamic Messages) and enrich it with derived attributes such as min/max, average and variance of original fields.
 In addition, a stream simulator for the raw messages is developed in the context of this module, which provides a functionality to replay the original stream of raw messages by generating a simulated new Kafka Stream and taking into the account the time delay between two consecutive messages of a trajectory, furthermore, this delay can be scaled in/out by a configuration parameter.
+
+The complete source code for our component can be found [here](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron).
 
 ### Contributers:
  ehab.qadah@iais.fraunhofer.de,<br/>
  michael.mock@iais.fraunhofer.de
 
 # Output Format and Samples:
- * The output line header for the maritime use case is as the following:
+ * The data schema of the In-Situ Processing component's output as the following:
   ` timestamp,id,longitude,latitude,speed,heading,msgErrorFlag,turn,course,status,
 NumberOfPoints,AverageDiffTime,LastDiffTime,MinDiffTime,MaxDiffTime,MaxSpeed,
-MinSpeed,AverageSpeed,VarianceSpeed,MinLong,MaxLong,MinLat,MaxLat,Minturn,Maxturn,
-MinHeading,MaxHeading `
-  * The following four records of a trajectory (id=228037600​):
+MinSpeed,AverageSpeed,VarianceSpeed,MinLong,MaxLong,MinLat,MaxLat,MinTurn,MaxTurn,
+MinHeading,MaxHeading`
+  * The following four samples of a trajectory (id=228037600​):
 ```csv
 2443660589,228037600,-4.342825,48.186092,9.1,511,,-127.0,197.7,15,686,14.83965014577259,11,7,311,10.2,5.6,9.12900874635568,0.3503100961334131,-4.45445,-4.316455,48.113506,48.20134,-127.0,-127.0,511,511
 1443660600,228037600,-4.34293,48.18563,9.1,511,,-127.0,190.4,15,687,14.834061135371174,11,7,311,10.2,5.6,9.128966521106255,0.34980140644830476,-4.45445,-4.316455,48.113506,48.20134,-127.0,-127.0,511,511
@@ -26,32 +24,37 @@ MinHeading,MaxHeading `
 ```
 
 # Output Description:
- * We use the same order of attributes and the delimiter (i.e., ",") as the AIS messages of NARI source with adding addition attributes computed by this module as depicted in the following table:
+ * We use the same attributes and the delimiter (i.e., ",") as the AIS messages of NARI source with adding addition attributes computed by this module as depicted in the following table:
 
-| Attribute        | Data type           |Description  |
-| ------------- |:-------------:|:-----|
-|  id 	        | integer       |A globally unique identifier for the moving object (usually, the MMSI of vessels).|
-|  status 	|integer        |  Navigational status
-|  turn 	|double         |  Rate of turn, right or left, 0 to 720 degrees per minute
-|  speed 	|double         |  Speed over ground in knotsint (allowed values: 0-102.2 knots)
-|  course 	|double         |  Course over ground (allowed values: 0-359.9 degrees)
-|  heading 	|integer      	|  True heading in degrees (0-359), relative to true north
-|  longitude    |double         |  Longitude (georeference: WGS 1984)
-| latitude 	|double         | Latitude  (georeference: WGS 1984)
-| timestamp 	|long           | timestamp in UNIX epochs (i.e., milliseconds elapsed since 1970-01-01 00:00:00.000).
-|AverageDiffTime|long           | The average of difference time between the positions message of a trajectory |
-|NumberOfPoints |long            | The accumulated number of the received points |
-|LastDiffTime   | long        | The time difference of the current message and the last previous received message|
-|MinSpeed       | double        | The minimum value of speed until current message. |
-|MinDiffTime    |long           | The minimum value of time difference until current message.|
-|MaxSpeed       | double        | The maximum value of speed until current message.|
-|MaxDiffTime    | double        | The maximum value of time difference until current message.|
-|MinLong        | double        | The minimum value of longitude  until current message.|
-|MaxLong        | double        | The maximum value of longitude until current message.|
-|MinLat         |double         |The minimum value of latitude  until current message. |
-|MaxLat         | double        |The maximum value of latitude  until current message. |
-|AverageSpeed   | double        | The average of the speed|
-|VarianceSpeed  |double         | The variance of speed |
+|Index| Attribute     | Data type           |Description  |
+|-------------| ------------- |:-------------:|:-----|
+|[0]| timestamp 	    |long           | timestamp in UNIX epochs (i.e., milliseconds elapsed since 1970-01-01 00:00:00.000).
+|[1]|  id 	          | integer       |A globally unique identifier for the moving object (usually, the MMSI of vessels).|
+|[2]|  longitude      |double         |  Longitude (georeference: WGS 1984).
+|[3]| latitude 	      |double         | Latitude  (georeference: WGS 1984).
+|[4]|  speed 	        |double         |  Speed over ground in knotsint (allowed values: 0-102.2 knots).
+|[5]|  heading 	      |integer      	|  True heading in degrees (0-359), relative to true north.
+|[6]|  msgErrorFlag 	|string         |  The MariWeb Security Appliance (MSA) error flags (if available).
+|[7]|  turn 	        |double         |  Rate of turn, right or left, 0 to 720 degrees per minute.
+|[8]|  course 	      |double         |  Course over ground (allowed values: 0-359.9 degrees).
+|[9]|  status 	      |integer        |  AIS Navigational Status reported by the vessel.
+|[10]|NumberOfPoints  |long           | The accumulated number of the received points i.e., AIS messages of the trajectory.|
+|[11]|AverageDiffTime |double         | The average of the time difference between the consecutive AIS messages of the trajectory |
+|[12]|LastDiffTime    | long          | The time difference of the current message and the previous received message|
+|[13]|MinDiffTime     |long           | The minimum value of time difference until the current AIS message.|
+|[14]|MaxDiffTime     |long           | The maximum value of time difference until the current AIS message.|
+|[15]|MaxSpeed        | double        | The maximum value of speed within the trajectory until the current AIS message.|
+|[16]|MinSpeed        | double        | The minimum value of speed with the trajectory until the current AIS message. |
+|[17]|AverageSpeed    | double        | The average value of the speed|
+|[18]|VarianceSpeed   |double         | The variance of speed |
+|[19]|MinLong         | double        | The minimum value of longitude of the trajectory until the current AIS message.|
+|[20]|MaxLong         | double        | The maximum value of longitude of the trajectory until the current AIS message.|
+|[21]|MinLat          |double         |The minimum value of latitude of the trajectory until the current AIS message. |
+|[22]|MaxLat          | double        |The maximum value of latitude of the trajectory until the current AIS message. |
+|[23]|MinTurn         |double         |The minimum value of turn until of the trajectory the current AIS message. |
+|[24]|MaxTurn         | double        |The maximum value of turn until the of the trajectory the current AIS message. |
+|[25]|MinHeading      |int            |The minimum value of heading until of the trajectory the current AIS message. |
+|[26]|MaxHeading      | int           |The maximum value of heading until of the trajectory the current AIS message. |
 
 # Run on Flink (locally):
  * To run the **In-Situ Processing module** on Flink cluster (locally):

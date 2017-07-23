@@ -18,6 +18,7 @@ package eu.datacron.in_situ_processing;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -25,6 +26,7 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010.FlinkKafkaProducer010Configuration;
+import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
@@ -36,6 +38,7 @@ import eu.datacron.in_situ_processing.maritime.streams.operators.AisStreamEnrich
 
 
 public class InSituProcessingApp {
+
 
   private static Configs configs = Configs.getInstance();
 
@@ -65,7 +68,7 @@ public class InSituProcessingApp {
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile);
 
     // execute program
-    env.execute("datAcron In-Situ Processing "+AppUtils.getAppVersion());
+    env.execute("datAcron In-Situ Processing " + AppUtils.getAppVersion());
 
   }
 
@@ -77,21 +80,21 @@ public class InSituProcessingApp {
   private static void writeEnrichedStream(DataStream<AisMessage> enrichedAisMessagesStream,
       String parsingConfig, boolean writeOnlyToFile) throws IOException {
 
-    if (writeOnlyToFile) {
-      String outputFile = configs.getStringProp("outputFilePath");
 
+    String outputFile = configs.getStringProp("outputFilePath");
 
-      // if (!new File(outputFile).isFile()) {
-      // Path p = Paths.get(outputFile);
-      // Files.createFile(p);
-      //
-      // }
-      // write to file
-      // enrichedAisMessagesStream.addSink(
-      // new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)));
+    // if (!new File(outputFile).isFile()) {
+    // Path p = Paths.get(outputFile);
+    // Files.createFile(p);
+    //
+    // }
+    // write to file
+    // enrichedAisMessagesStream.addSink(
+    // new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)));
 
-      enrichedAisMessagesStream.writeAsText(outputFile, WriteMode.OVERWRITE);
-    } else {
+    enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(parsingConfig)).writeAsText(
+        outputFile, WriteMode.OVERWRITE);
+    if (!writeOnlyToFile) {
       // Write to Kafka
       Properties producerProps = AppUtils.getKafkaProducerProperties();
       String outputStreamTopic = configs.getStringProp("outputStreamTopicName");
@@ -151,5 +154,31 @@ public class InSituProcessingApp {
         return null;
     }
 
+  }
+
+
+  /**
+   * A map operator of AIS messages to CSV format
+   * 
+   * @author ehab.qadah
+   *
+   */
+  public static final class AisMessagesToCsvMapper implements MapFunction<AisMessage, String> {
+
+    private static final long serialVersionUID = 5306666449608883748L;
+    private String delimiter;
+
+    public AisMessagesToCsvMapper() {}
+
+    public AisMessagesToCsvMapper(String parsingJsonConfigsStr) {
+      JSONObject parsingJsonConfigs = new JSONObject(parsingJsonConfigsStr);
+      this.delimiter = parsingJsonConfigs.getString("delimiter");
+    }
+
+    @Override
+    public String map(AisMessage value) throws Exception {
+
+      return value.toCsv(delimiter);
+    }
   }
 }
