@@ -23,8 +23,6 @@ import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
  */
 public class AppUtils {
 
-
-
   private static Configs configs = Configs.getInstance();
   static Logger logger = Logger.getLogger(AppUtils.class.getName());
 
@@ -38,7 +36,8 @@ public class AppUtils {
    * @return
    */
   public static DataStream<AisMessage> getAISMessagesStream(StreamExecutionEnvironment env,
-      StreamSourceType streamSource, String filePathOrTopicProperty, String parsingConfig) {
+      StreamSourceType streamSource, String filePathOrTopicProperty, String parsingConfig,
+      String outputLineDelimiter) {
     DataStream<AisMessage> aisMessagesStream = null;
     switch (streamSource) {
       case KAFKA:
@@ -46,7 +45,7 @@ public class AppUtils {
         // create a Kafka consumer
         FlinkKafkaConsumer010<AisMessage> kafkaConsumer =
             new FlinkKafkaConsumer010<AisMessage>(configs.getStringProp(filePathOrTopicProperty),
-                new AisMessageCsvSchema(parsingConfig), kafakaProps);
+                new AisMessageCsvSchema(parsingConfig, outputLineDelimiter), kafakaProps);
         // kafkaConsumer.assignTimestampsAndWatermarks(arg0)
         aisMessagesStream = env.addSource(kafkaConsumer);
         break;
@@ -56,8 +55,8 @@ public class AppUtils {
         // env.addSource(
         // new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),
         // parsingConfig)).setParallelism(1)
-            env.readTextFile(configs.getStringProp(filePathOrTopicProperty))
-                .flatMap(new CSVLineToAISMessageMapper(parsingConfig));
+            env.readTextFile(configs.getStringProp(filePathOrTopicProperty)).flatMap(
+                new CSVLineToAISMessageMapper(parsingConfig));
 
         break;
     }
@@ -112,7 +111,6 @@ public class AppUtils {
    * @return
    */
   public static String getAppVersion() {
-
 
     return AppUtils.class.getPackage().getImplementationVersion();
   }

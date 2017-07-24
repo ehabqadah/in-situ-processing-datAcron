@@ -22,27 +22,35 @@ import eu.datacron.in_situ_processing.common.utils.ReflectionUtils;
 public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
     DeserializationSchema<AisMessage> {
 
+  private static final String DEFAULT_OUTPUT_LINE_DELIMITER = ",";
   private static final long serialVersionUID = 4339578918900034257L;
   private static final Logger logger = LoggerFactory.getLogger(AisMessageCsvSchema.class.getName());
   private transient JSONObject parsingJsonConfigs;
   private String parsingJsonConfigsStr;
   String delimiter;
   private boolean addNewLine;
+  private String outputLineDelimiter;
 
   public AisMessageCsvSchema() {}
 
-
-  public AisMessageCsvSchema(String parsingJsonConfigsStr, boolean addNewLine) {
-    setupSchema(parsingJsonConfigsStr, addNewLine);
-  }
-
   public AisMessageCsvSchema(String parsingJsonConfigsStr) {
-    setupSchema(parsingJsonConfigsStr, false);
+    setupSchema(parsingJsonConfigsStr, DEFAULT_OUTPUT_LINE_DELIMITER, false);
   }
 
-  private void setupSchema(String parsingJsonConfigsStr, boolean addNewLine) {
+  public AisMessageCsvSchema(String parsingJsonConfigsStr, String outputLineDelimiter) {
+    setupSchema(parsingJsonConfigsStr, outputLineDelimiter, false);
+  }
+
+  public AisMessageCsvSchema(String parsingJsonConfigsStr, String outputLineDelimiter,
+      boolean addNewLine) {
+    setupSchema(parsingJsonConfigsStr, outputLineDelimiter, addNewLine);
+  }
+
+  private void setupSchema(String parsingJsonConfigsStr, String outputLineDelimiter,
+      boolean addNewLine) {
     this.parsingJsonConfigsStr = parsingJsonConfigsStr;
     this.addNewLine = addNewLine;
+    this.outputLineDelimiter = outputLineDelimiter;
     initParsingConfigObject();
   }
 
@@ -62,8 +70,8 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
 
   @Override
   public byte[] serialize(AisMessage element) {
-    String uniformDelimiter = ",";
-    String csvLine = element.toCsv(uniformDelimiter);
+
+    String csvLine = element.toCsv(outputLineDelimiter);
     if (addNewLine) {
       csvLine += "\n";
     }

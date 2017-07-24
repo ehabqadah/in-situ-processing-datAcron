@@ -26,7 +26,6 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010.FlinkKafkaProducer010Configuration;
-import org.json.JSONObject;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
@@ -50,11 +49,13 @@ public class InSituProcessingApp {
 
     StreamSourceType streamSource =
         StreamSourceType.valueOf(configs.getStringProp("streamSourceType").toUpperCase());
+    String outputLineDelimiter = configs.getStringProp("outputLineDelimiter");
+
     // Get the json config for parsing the raw input stream
     String parsingConfig = AppUtils.getParsingJsonConfig();
 
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
-        setupKayedAisMessagesStream(env, streamSource, parsingConfig);
+        setupKayedAisMessagesStream(env, streamSource, parsingConfig, outputLineDelimiter);
 
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStreamWithOrder =
         setupOrderStream(kaydAisMessagesStream);
@@ -63,9 +64,10 @@ public class InSituProcessingApp {
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
 
-    enrichedAisMessagesStream.print();
+    //enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka or file
-    writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile);
+    writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile,
+        outputLineDelimiter);
 
     // execute program
     env.execute("datAcron In-Situ Processing " + AppUtils.getAppVersion());
@@ -78,21 +80,15 @@ public class InSituProcessingApp {
   }
 
   private static void writeEnrichedStream(DataStream<AisMessage> enrichedAisMessagesStream,
-      String parsingConfig, boolean writeOnlyToFile) throws IOException {
+      String parsingConfig, boolean writeOnlyToFile, String outputLineDelimiter) throws IOException {
 
 
     String outputFile = configs.getStringProp("outputFilePath");
 
-    // if (!new File(outputFile).isFile()) {
-    // Path p = Paths.get(outputFile);
-    // Files.createFile(p);
-    //
-    // }
-    // write to file
     // enrichedAisMessagesStream.addSink(
     // new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)));
 
-    enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(parsingConfig)).writeAsText(
+    enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter)).writeAsText(
         outputFile, WriteMode.OVERWRITE);
     if (!writeOnlyToFile) {
       // Write to Kafka
@@ -101,14 +97,14 @@ public class InSituProcessingApp {
 
       FlinkKafkaProducer010Configuration<AisMessage> myProducerConfig =
           FlinkKafkaProducer010.writeToKafkaWithTimestamps(enrichedAisMessagesStream,
-              outputStreamTopic, new AisMessageCsvSchema(parsingConfig), producerProps);
+              outputStreamTopic, new AisMessageCsvSchema(parsingConfig, outputLineDelimiter),
+              producerProps);
 
       // the following is necessary for at-least-once delivery guarantee
       myProducerConfig.setLogFailuresOnly(false); // "false" by default
       myProducerConfig.setFlushOnCheckpoint(true); // "false" by default
 
     }
-
   }
 
   /***
@@ -120,10 +116,11 @@ public class InSituProcessingApp {
    * @return
    */
   private static KeyedStream<AisMessage, Tuple> setupKayedAisMessagesStream(
-      final StreamExecutionEnvironment env, StreamSourceType streamSource, String parsingConfig) {
+      final StreamExecutionEnvironment env, StreamSourceType streamSource, String parsingConfig,
+      String outputLineDelimiter) {
     DataStream<AisMessage> aisMessagesStream =
         AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),
-            parsingConfig);
+            parsingConfig, outputLineDelimiter);
 
     // Assign the timestamp of the AIS messages based on their timestamps
     DataStream<AisMessage> aisMessagesStreamWithTimeStamp =
@@ -156,7 +153,6 @@ public class InSituProcessingApp {
 
   }
 
-
   /**
    * A map operator of AIS messages to CSV format
    * 
@@ -170,9 +166,8 @@ public class InSituProcessingApp {
 
     public AisMessagesToCsvMapper() {}
 
-    public AisMessagesToCsvMapper(String parsingJsonConfigsStr) {
-      JSONObject parsingJsonConfigs = new JSONObject(parsingJsonConfigsStr);
-      this.delimiter = parsingJsonConfigs.getString("delimiter");
+    public AisMessagesToCsvMapper(String outputLineDelimiter) {
+      this.delimiter = outputLineDelimiter;
     }
 
     @Override
