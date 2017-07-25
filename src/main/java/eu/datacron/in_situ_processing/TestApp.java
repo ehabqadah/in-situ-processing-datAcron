@@ -18,21 +18,23 @@ public class TestApp {
 
   public static void main(String[] args) throws IOException {
 
-    System.out.println(configs.getStringProp("streamSourceType"));
-
-    InputStream input = null;
-    input = Configs.class.getResourceAsStream("/IMIS_Global_CSV_Schema.json");
-
-
-    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-    StringBuilder out = new StringBuilder();
-    String line;
-    while ((line = reader.readLine()) != null) {
-      out.append(line);
-    }
-    JSONObject criticalPointJson = new JSONObject(out.toString());
-    System.out.println(out.toString()); // Prints the string content read from input stream
-    reader.close();
+    String [] fields="1453984747,1,215130000,1,29.2796666666667,40.8366833333333,307,0,,".split(",",-1);
+    System.out.println(fields.length);
+//    System.out.println(configs.getStringProp("streamSourceType"));
+//
+//    InputStream input = null;
+//    input = Configs.class.getResourceAsStream("/IMIS_Global_CSV_Schema.json");
+//
+//
+//    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+//    StringBuilder out = new StringBuilder();
+//    String line;
+//    while ((line = reader.readLine()) != null) {
+//      out.append(line);
+//    }
+//    JSONObject criticalPointJson = new JSONObject(out.toString());
+//    System.out.println(out.toString()); // Prints the string content read from input stream
+//    reader.close();
   }
 
 

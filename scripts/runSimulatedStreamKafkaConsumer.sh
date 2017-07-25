@@ -23,6 +23,8 @@ done < ../src/main/resources/config.properties
 KAFKA_DIR="/home/ehabqadah/frameworks/kafka_2.11-0.10.2.0"
 cd $KAFKA_DIR
 
+
+
 #Start the kafka consumer for output stream of in-situ processing 
-sudo ./bin/kafka-console-consumer.sh --topic $topicName --bootstrap-server $bootstrapServers --from-beginning
+sudo ./bin/kafka-console-consumer.sh --topic ais_critical_points  --bootstrap-server $bootstrapServers --from-beginning
 
