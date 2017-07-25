@@ -42,6 +42,8 @@ public class AisMessage extends PositionMessage {
   public AisMessage prevAisMessage = null;
   public List<AisMessage> prevAisMessages = new ArrayList<AisMessage>();
 
+  private String originalRawMessage;
+
   /**
    * Default constructor.
    */
@@ -301,6 +303,14 @@ public class AisMessage extends PositionMessage {
     }
     return message;
 
+  }
+
+  public String getOriginalRawMessage() {
+    return originalRawMessage;
+  }
+
+  public void setOriginalRawMessage(String originalRawMessage) {
+    this.originalRawMessage = originalRawMessage;
   }
 
 

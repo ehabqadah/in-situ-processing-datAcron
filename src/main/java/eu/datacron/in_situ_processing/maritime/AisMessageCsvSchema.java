@@ -95,7 +95,7 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
     initParsingConfigObject();
     AisMessage aisMessage = new AisMessage();
 
-    String[] fieldsValue = csvLine.split(delimiter);
+    String[] fieldsValue = csvLine.split(delimiter, -1);// -1 to include trailing empty strings
 
     for (Field field : AisMessage.class.getFields()) {
       String fieldName = field.getName();
@@ -119,7 +119,7 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
         }
       }
     }
-
+    aisMessage.setOriginalRawMessage(csvLine);
     return aisMessage;
   }
 

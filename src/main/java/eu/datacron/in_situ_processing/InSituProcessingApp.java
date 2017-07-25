@@ -64,7 +64,8 @@ public class InSituProcessingApp {
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
 
-    //enrichedAisMessagesStream.print();
+
+    // enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka or file
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile,
         outputLineDelimiter);
@@ -130,8 +131,8 @@ public class InSituProcessingApp {
     // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them
     // based on the message ID (MMSI for vessels)
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
-        aisMessagesStreamWithTimeStamp.keyBy("id").process(new AisMessagesStreamSorter())
-            .keyBy("id");
+        aisMessagesStreamWithTimeStamp.keyBy("id");// .process(new AisMessagesStreamSorter())
+    // .keyBy("id");
     return kaydAisMessagesStream;
   }
 
