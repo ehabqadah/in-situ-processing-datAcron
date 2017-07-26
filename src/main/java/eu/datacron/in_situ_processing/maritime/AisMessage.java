@@ -8,12 +8,11 @@ import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
 /**
  * AIS (Automatic Identification System) message wrapper.
  * 
- * @author ehabqadah
+ * @author ehab.qadah
  *
  */
-public class AisMessage extends PositionMessage {
+public class AisMessage implements PositionMessage {
   private static final long serialVersionUID = 7555537850826069540L;
-
 
   /** timestamp in UNIX epochs (i.e., milliseconds elapsed since 1970-01-01 00:00:00.000). */
   public long timestamp;
@@ -259,21 +258,18 @@ public class AisMessage extends PositionMessage {
     this.msgErrorFlag = msgErrorFlag;
   }
 
-
-  @Override
   public String toString() {
-
-    // return toCsv(",");
     String message =
-        "AISMessage [timestamp=" + timestamp + ", id=" + id + ", longitude=" + longitude
+        "AisMessage [timestamp=" + timestamp + ", id=" + id + ", longitude=" + longitude
             + ", latitude=" + latitude + ", turn=" + turn + ", speed=" + speed + ", heading="
-            + heading + ", course=" + course + ", status=" + status + "]";
+            + heading + ", course=" + course + ", status=" + status + ", msgErrorFlag="
+            + msgErrorFlag;
 
     if (getStatistics() != null) {
 
       message += getStatistics().toString();
     }
-    return message;
+    return message + "]";
   }
 
   @Override
@@ -290,7 +286,6 @@ public class AisMessage extends PositionMessage {
 
   @Override
   public String toCsv(String delimiter) {
-
 
     String message =
         timestamp + delimiter + id + delimiter + longitude + delimiter + latitude + delimiter
