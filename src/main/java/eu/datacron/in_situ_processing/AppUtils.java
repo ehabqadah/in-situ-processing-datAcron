@@ -12,9 +12,10 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.log4j.Logger;
 
 import eu.datacron.in_situ_processing.common.utils.Configs;
-import eu.datacron.in_situ_processing.flink.utils.CSVLineToAISMessageMapper;
+import eu.datacron.in_situ_processing.flink.utils.FileLinesStreamSource;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
+import eu.datacron.in_situ_processing.maritime.streams.operators.CsvLineToAisMessageMapper;
 
 
 
@@ -52,11 +53,12 @@ public class AppUtils {
       case FILE:
 
         aisMessagesStream =
-        // env.addSource(
-        // new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),
-        // parsingConfig)).setParallelism(1)
-            env.readTextFile(configs.getStringProp(filePathOrTopicProperty)).flatMap(
-                new CSVLineToAISMessageMapper(parsingConfig));
+            env.addSource(
+                new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),
+                    parsingConfig))
+                .flatMap(new CsvLineToAisMessageMapper(parsingConfig)).setParallelism(1);
+        // env.readTextFile(configs.getStringProp(filePathOrTopicProperty)).flatMap(
+        // new CSVLineToAISMessageMapper(parsingConfig));
 
         break;
     }

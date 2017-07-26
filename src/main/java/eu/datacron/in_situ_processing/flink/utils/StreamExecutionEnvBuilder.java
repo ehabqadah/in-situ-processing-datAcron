@@ -1,8 +1,14 @@
 package eu.datacron.in_situ_processing.flink.utils;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.flink.api.common.ExecutionMode;
+import org.apache.flink.api.common.restartstrategy.RestartStrategies;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 
 /**
  * Flink Stream execution builder.
@@ -14,7 +20,7 @@ public class StreamExecutionEnvBuilder {
 
   private StreamExecutionEnvironment env;
 
-  public StreamExecutionEnvBuilder() {
+  public StreamExecutionEnvBuilder() throws IOException {
     // setup the environment with default values
     // set up streaming execution environment
     env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -26,11 +32,20 @@ public class StreamExecutionEnvBuilder {
     setAutoWatermarkInterval(1000);
     env.setBufferTimeout(1000);
     env.getConfig().setExecutionMode(ExecutionMode.PIPELINED);
+    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(2, // number of restart attempts
+        Time.of(10, TimeUnit.SECONDS) // delay
+        ));
   }
 
   public StreamExecutionEnvBuilder setAutoWatermarkInterval(long interval) {
 
     env.getConfig().setAutoWatermarkInterval(interval);
+    return this;
+  }
+
+  public StreamExecutionEnvBuilder setStateBackend(String path) throws IOException {
+
+    env.setStateBackend(new FsStateBackend(path, true));
     return this;
   }
 
