@@ -4,13 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.flink.api.common.ExecutionMode;
-
-
-
 // import com.google.common.collect.Lists;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
-import eu.datacron.in_situ_processing.maritime.PositionMessage;
 
 /**
  * @author ehab.qadah
@@ -18,17 +13,41 @@ import eu.datacron.in_situ_processing.maritime.PositionMessage;
 public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
 
   private static final long serialVersionUID = -4223639731431853133L;
+  private double onlineSpeedMean;
+  private double aggregatedSumOfSquaresMeanDiffs;
 
   public AisTrajectoryStatistics() {
     setNumberOfPoints(0);
   }
 
   @Override
-  public List<AisMessage> processNewPosition(AisMessage aisMessage) throws Exception {
+  public AisMessage processNewPosition(AisMessage aisMessage) throws Exception {
+
+    processNewAisMessage(aisMessage);
+
+    return aisMessage;
+  }
+
+  public double getOnlineSpeedMean() {
+    return onlineSpeedMean;
+  }
+
+  public void setOnlineSpeedMean(double onlineSpeedMean) {
+    this.onlineSpeedMean = onlineSpeedMean;
+  }
+
+  public double getAggregatedSumOfSquaresMeanDiffs() {
+    return aggregatedSumOfSquaresMeanDiffs;
+  }
+
+  public void setAggregatedSumOfSquaresMeanDiffs(double aggregatedSumOfSquaresMeanDiffs) {
+    this.aggregatedSumOfSquaresMeanDiffs = aggregatedSumOfSquaresMeanDiffs;
+  }
+
+  public List<AisMessage> processNewPositionList(AisMessage aisMessage) throws Exception {
 
     List<AisMessage> unorderedList = new ArrayList<AisMessage>();
     List<AisMessage> result = new ArrayList<AisMessage>();
-
 
     List<AisMessage> prevAisMessages = aisMessage.prevAisMessages;
 
@@ -54,7 +73,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
 
     // System.out.println(aisMessage);
     if (getNumberOfPoints() == 0) {
-      initFirstMessageAttributes(aisMessage);
+      initStatisticsAttributes(aisMessage);
     }
     // update location related attributes
     updateLocationAttributes(aisMessage);
@@ -70,7 +89,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
    * 
    * @param aisMessage
    */
-  private void initFirstMessageAttributes(AisMessage aisMessage) {
+  private void initStatisticsAttributes(AisMessage aisMessage) {
     this.minLat = aisMessage.getLatitude();
     this.maxLat = aisMessage.getLatitude();
 
@@ -95,19 +114,41 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     setMinSpeed(speed);
     setMaxSpeed(speed);
     double oldAverageSpeed = getAverageSpeed();
-    double aggreagtedSpeedSum = oldAverageSpeed * getNumberOfPoints() + speed;
+    double aggregatedSpeedSum = oldAverageSpeed * getNumberOfPoints() + speed;
     double pointsCount = getNumberOfPoints() + 1.0;
-    // compute new average
-    double newAverageSpeed = aggreagtedSpeedSum / pointsCount;
+    // compute new average and variance of the speed
+    double newAverageSpeed = aggregatedSpeedSum / pointsCount;
     setAverageSpeed(newAverageSpeed);
-    // compute the speed variance
-    this.getPrevSpeeds().add(speed);
-    double sumOfSquareMeanDiff = 0.0;
-    for (double prevSpeed : this.getPrevSpeeds()) {
-      sumOfSquareMeanDiff += Math.pow(prevSpeed - newAverageSpeed, 2);
+    computeOnlineVarianceOfSpeed(speed);
+  }
+
+  /**
+   * Compute the online variance of the speed based on {B. P. Welford
+   * (1962)."Note on a method for calculating corrected sums of squares and products"}
+   * 
+   * @see https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
+   * @param newSpeed
+   */
+  void computeOnlineVarianceOfSpeed(double newSpeed) {
+
+    long n = getNumberOfPoints();
+    if (n == 0) {
+      setOnlineSpeedMean(0.0);
+      setAggregatedSumOfSquaresMeanDiffs(0.0);
     }
-    // set variance of speed
-    setVarianceSpeed(sumOfSquareMeanDiff / pointsCount);
+    n += 1;
+    double delta = newSpeed - getOnlineSpeedMean(); // new speed -old mean
+    setOnlineSpeedMean(getOnlineSpeedMean() + delta / n); // new sample mean
+    double delta2 = newSpeed - getOnlineSpeedMean();// new speed -new mean
+    // update the sum of squares differences of speeds from mean
+    setAggregatedSumOfSquaresMeanDiffs(getAggregatedSumOfSquaresMeanDiffs() + delta * delta2);
+
+    if (n < 2) {
+      setVarianceSpeed(0.0);
+    } else {
+      double variance = getAggregatedSumOfSquaresMeanDiffs() / (n - 1);
+      setVarianceSpeed(variance);
+    }
   }
 
   private void updateTimeAttributes(AisMessage aisMessage) throws Exception {
@@ -150,20 +191,19 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     setMinTurn(aisMessage.getTurn());
   }
 
-
   @Override
   public String toString() {
-    return " \n AisTrajectoryStatistics [getAverageDiffTime()=" + getAverageDiffTime()
-        + ", getNumberOfPoints()=" + getNumberOfPoints() + ", getLastTimestamp()="
-        + getLastTimestamp() + ", getLastDiffTime()=" + getLastDiffTime() + ", getMinSpeed()="
-        + getMinSpeed() + ", getMinDiffTime()=" + getMinDiffTime() + ", getMaxSpeed()="
-        + getMaxSpeed() + ", getMaxDiffTime()=" + getMaxDiffTime() + ", getMinLong()="
-        + getMinLong() + ", getMaxLong()=" + getMaxLong() + ", getMinLat()=" + getMinLat()
-        + ", getMaxLat()=" + getMaxLat() + ", getLastDifftime()=" + getLastDifftime()
-        + ", getAverageSpeed()=" + getAverageSpeed() + ", getVarianceSpeed()=" + getVarianceSpeed()
-        + "] \n";
+    return "AisTrajectoryStatistics [onlineSpeedMean=" + getOnlineSpeedMean()
+        + ", aggregatedSumOfSquaresMeanDiffs=" + getAggregatedSumOfSquaresMeanDiffs()
+        + ", numberOfPoints=" + numberOfPoints + ", lastTimestamp=" + lastTimestamp
+        + ", lastDifftime=" + lastDifftime + ", minSpeed=" + minSpeed + ", maxSpeed=" + maxSpeed
+        + ", minDiffTime=" + minDiffTime + ", maxDiffTime=" + maxDiffTime + ", minHeading="
+        + minHeading + ", minTurn=" + minTurn + ", minLong=" + minLong + ", maxLong=" + maxLong
+        + ", minLat=" + minLat + ", maxLat=" + maxLat + ", maxHeading=" + maxHeading + ", maxTurn="
+        + maxTurn + ", averageSpeed=" + averageSpeed + ", averageDiffTime=" + averageDiffTime
+        + ", varianceSpeed=" + varianceSpeed + "]";
   }
-  
+
   @Override
   public String toCsv(String delimiter) {
 
@@ -174,5 +214,4 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
         + getMinLat() + delimiter + getMaxLat() + delimiter + getMinturn() + delimiter
         + getMaxturn() + delimiter + getMinHeading() + delimiter + getMaxHeading();
   }
-
 }

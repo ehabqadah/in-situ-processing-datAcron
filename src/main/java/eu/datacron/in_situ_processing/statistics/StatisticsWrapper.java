@@ -199,7 +199,7 @@ public abstract class StatisticsWrapper<T> implements Serializable {
    * @param positionMessage
    * @throws Exception
    */
-  public abstract List<T> processNewPosition(T positionMessage) throws Exception;
+  public abstract T processNewPosition(T positionMessage) throws Exception;
 
   public abstract String toCsv(String delimiter);
 
