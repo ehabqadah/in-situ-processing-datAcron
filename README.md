@@ -1,7 +1,7 @@
 # In-Situ Processing - datAcron
 
-This is a component within the [datAcron EU](http://www.datacron-project.eu/) project, it aims to provide a Flink component that process a stream of raw messages (i.e., AIS Dynamic Messages) and enrich it with derived attributes such as min/max, average and variance of original fields.
-In addition, a stream simulator for the raw messages is developed in the context of this module, which provides a functionality to replay the original stream of raw messages by generating a simulated new Kafka Stream and taking into the account the time delay between two consecutive messages of a trajectory, furthermore, this delay can be scaled in/out by a configuration parameter.
+This is a component within the [datAcron EU](http://www.datacron-project.eu/) project, it aims to provide a Flink component that process a stream of raw messages (i.e., AIS Dynamic Messages) and enrich it with derived attributes such as min/max, average and variance of original fields (See `Output Format and Samples` & `Output Schema Description`).
+In addition, a stream simulator for the raw messages is developed in the context of this module, which provides a functionality to re-play the original stream of raw messages by generating a simulated new Kafka Stream and taking into the account the time delay between two consecutive messages of a trajectory, furthermore, this delay can be scaled in/out by a configuration parameter (`streamDelayScale`).
 
 The complete source code for our component can be found [here](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron).
 
@@ -23,7 +23,7 @@ MinHeading,MaxHeading`
 1443660629,228037600,-4.3426933,48.184425,9.2,511,,-127.0,166.0,15,690,14.811594202898545,9,7,311,10.2,5.6,9.128985507246373,0.3482902751522813,-4.45445,-4.316455,48.113506,48.20134,-127.0,-127.0,511,511
 ```
 
-# Output Description:
+# Output Schema Description:
  * We use the same attributes and the delimiter (i.e., ",") as the AIS messages of NARI source with adding addition attributes computed by this module as depicted in the following table:
 
 |Index| Attribute     | Data type           |Description  |
@@ -41,35 +41,35 @@ MinHeading,MaxHeading`
 |[10]|NumberOfPoints  |long           | The accumulated number of the received points i.e., AIS messages of the trajectory.|
 |[11]|AverageDiffTime |double         | The average of the time difference between the consecutive AIS messages of the trajectory |
 |[12]|LastDiffTime    | long          | The time difference of the current message and the previous received message|
-|[13]|MinDiffTime     |long           | The minimum value of time difference until the current AIS message.|
-|[14]|MaxDiffTime     |long           | The maximum value of time difference until the current AIS message.|
-|[15]|MaxSpeed        | double        | The maximum value of speed within the trajectory until the current AIS message.|
-|[16]|MinSpeed        | double        | The minimum value of speed with the trajectory until the current AIS message. |
+|[13]|MinDiffTime     |long           | The minimum value of the time difference until the current AIS message.|
+|[14]|MaxDiffTime     |long           | The maximum value of the time difference until the current AIS message.|
+|[15]|MaxSpeed        | double        | The maximum value of the speed within the trajectory until the current AIS message.|
+|[16]|MinSpeed        | double        | The minimum value of the speed with the trajectory until the current AIS message. |
 |[17]|AverageSpeed    | double        | The average value of the speed|
-|[18]|VarianceSpeed   |double         | The variance of speed |
-|[19]|MinLong         | double        | The minimum value of longitude of the trajectory until the current AIS message.|
-|[20]|MaxLong         | double        | The maximum value of longitude of the trajectory until the current AIS message.|
-|[21]|MinLat          |double         |The minimum value of latitude of the trajectory until the current AIS message. |
-|[22]|MaxLat          | double        |The maximum value of latitude of the trajectory until the current AIS message. |
-|[23]|MinTurn         |double         |The minimum value of turn until of the trajectory the current AIS message. |
-|[24]|MaxTurn         | double        |The maximum value of turn until the of the trajectory the current AIS message. |
-|[25]|MinHeading      |int            |The minimum value of heading until of the trajectory the current AIS message. |
-|[26]|MaxHeading      | int           |The maximum value of heading until of the trajectory the current AIS message. |
+|[18]|VarianceSpeed   |double         | The sample variance of speed |
+|[19]|MinLong         | double        | The minimum value of the longitude of the trajectory until the current AIS message.|
+|[20]|MaxLong         | double        | The maximum value of the longitude of the trajectory until the current AIS message.|
+|[21]|MinLat          |double         |The minimum value of the latitude of the trajectory until the current AIS message. |
+|[22]|MaxLat          | double        |The maximum value of the latitude of the trajectory until the current AIS message. |
+|[23]|MinTurn         |double         |The minimum value of the turn until of the trajectory the current AIS message. |
+|[24]|MaxTurn         | double        |The maximum value of the turn until the of the trajectory the current AIS message. |
+|[25]|MinHeading      |int            |The minimum value of the heading until of the trajectory the current AIS message. |
+|[26]|MaxHeading      | int           |The maximum value of the heading until of the trajectory the current AIS message. |
 
 # Run on Flink (locally):
- * To run the **In-Situ Processing module** on Flink cluster (locally):
+ * To deploy the **In-Situ Processing module** on Flink cluster (locally):
     * Go the root directory of the project.
-    * Edit the 'scripts/runInSituOnFlinkLocally.sh' and update the correct local directory of the Flink installation for the `FLINK_DIR`  in the script.
-    * Make sure that the script file has a permission to be executed, use 'chmod +x scripts/runInSituOnFlinkLocally.sh'.
-    * Run the script by `./scripts/runInSituOnFlinkLocally.sh` that submit the In-Situ Processing job to the local Flink cluster.
+    * Edit the `/in-situ-processing-datAcron/scripts/deployOnFlinkCluster.sh` and update the correct directory of the Flink installation by changing the `FLINK_DIR` variable in the script.
+    * Make sure that the script file has a permission to be executed, use `/in-situ-processing-datAcron/scripts/deployOnFlinkCluster.sh`.
+    * Run the script by `/in-situ-processing-datAcron/scripts/deployOnFlinkCluster.sh` that submit the In-Situ Processing job to the local Flink cluster.
 
- * To run the **Stream Simulator** component on Flink cluster (locally):
+ * To run the **Raw AIS Messages Stream Simulator** component on Flink cluster (locally):
       * Go the root directory of the project.
-      * Edit the 'scripts/runSimulatorOnFlinkLocally.sh' and update the correct local directory of the Flink installation for the `FLINK_DIR`  in the script.
-      * Make sure that the script file has a permission to be executed, use 'chmod +x scripts/runSimulatorOnFlinkLocally.sh'.
-      * Run the script by `./scripts/runSimulatorOnFlinkLocally.sh` that submit the Stream simulator job to the local Flink cluster.    
+      * Edit the `/in-situ-processing-datAcron/scripts/deploySimulatorOnFlink.sh` and update the correct local directory of the Flink installation by changing the `FLINK_DIR` variable in the script.
+      * Make sure that the script file has a permission to be executed, use `chmod +x /in-situ-processing-datAcron/scripts/deploySimulatorOnFlink.sh`.
+      * Run the script by `./scripts/runSimulatorOnFlinkLocally.sh` that submit the Stream simulator job to the Flink cluster.    
 
-# Setup in development mode:
+# Setup for local development:
 * To Setup the Kafka cluster locally, run a predefined shell script `scrips/setup-kafka.sh`
 * To execute the simulator for the stream of raw messages, run `eu.datacron.in_situ_processing.streams.simulation.RawStreamSimulator`.
 *  To execute the In-Situ Processing module:  `eu.datacron.in_situ_processing.InSituProcessingApp`.
@@ -78,7 +78,7 @@ MinHeading,MaxHeading`
 
 # Configurations:
 
-This section describes the different configurations/parameter that cusomize the execution of the In-Situ Processing module, the following are the all parameter of the mdoule along side with their description and usage, and all configs are located in the [config.properties](/src/main/resources/config.properties) file.
+This section describes the different configurations/parameter that cusomize the execution of the In-Situ Processing module, the following are the full parameters list of the module along side with their description and usage, can be changed in the [config.properties](/src/main/resources/config.properties) file.
 
 | Parameter  Name        | Example           | Description  | Used In  |
 | ------------- |:-------------:| :-----:|:------------:|
@@ -86,8 +86,12 @@ This section describes the different configurations/parameter that cusomize the 
 | `zookeeper`  | localhost:2181|A list of host/port pairs to use for establishing the initial connection to the Kafka cluster, for more details check [here](https://kafka.apache.org/documentation/#brokerconfigs) |`InSituProcessingApp` & `RawStreamSimulator`|
 | `inputStreamTopicName` | aisInsituIn|This is the topic name of the output stream of the RawStreamSimulator and the topic name of the input stream of `InSituProcessingApp`, so both components are connected through a Kafka stream |`InSituProcessingApp` & `RawStreamSimulator`|
 | `outputStreamTopicName` | aisInsituOut|The topic name of the output stream of the In-Situ Processing (i.e., **enriched stream**)|`InSituProcessingApp` |
-| `kafkaGroupId` | myGroup|The Kafka consumer group name for the `InSituProcessingApp` if the `streamSourceType` is set as `KAFKA` |`InSituProcessingApp`|
+| `kafkaGroupId` | in_situ|The Kafka consumer group name for the `InSituProcessingApp` if the `streamSourceType` is set as `KAFKA` |`InSituProcessingApp`|
 | `aisMessagesFilePath` | ./data/nari_test_dataset.csv|The path of the input dataset file|`InSituProcessingApp` & `RawStreamSimulator`|
 | `streamSourceType` | FILE or KAFKA |This to select which source to be used as input for the In-Situ Processing module eitherdirectly by reading an input file (**aisMessagesFilePath**) <br/>or by ingesting a Kafka stream (**inputStreamTopicName**)|`InSituProcessingApp` |
-| `streamDelayScale` | 10.0|Scale factor of the time delay between the raw messages in the Stream simulator (i.e., simulated delay = actual delay *streamDelayScale )| `RawStreamSimulator`|
-| `inputDataSchema` | [nariRawStreamSchema.json](/src/main/resources/nariRawStreamSchema.json) or [imisRawStreamSchema.json](/src/main/resources/imisRawStreamSchema.json)| Specifies the schema of the input raw messages to support multiple sources such as IMIS Global and NARI files in the maritime use case|`InSituProcessingApp` & `RawStreamSimulator`|
+| `streamDelayScale` | 1.0|Scale factor of the time delay between the raw messages in the Stream simulator (i.e., simulated delay = actual delay *streamDelayScale )| `RawStreamSimulator`|
+| `inputDataSchema` | [nariRawStreamSchema.json](/src/main/resources/nariRawStreamSchema.json) ,  [imisRawStreamSchema.json](/src/main/resources/imisRawStreamSchema.json) and [imisFullRawStreamSchema.json](/src/main/resources/imisFullRawStreamSchema.json) | Specifies the schema of the input raw messages to support multiple sources such as IMIS Global and NARI files in the maritime use case|`InSituProcessingApp` & `RawStreamSimulator`|
+|`flinkCheckPointsPath`|checkpoints|The directory of the Flink checkpoints |`InSituProcessingApp` & `RawStreamSimulator`|
+|`writeOutputParallelism`|8|The parallelism level of the output stream writer|`InSituProcessingApp`|
+|`outputLineDelimiter`|,|The separator of the line of the output stream|`InSituProcessingApp`|
+|`outputFilePath`||The output path of enriched stream file|`InSituProcessingApp`|

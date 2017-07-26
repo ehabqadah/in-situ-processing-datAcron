@@ -24,14 +24,12 @@ KAFKA_DIR="/home/ehabqadah/frameworks/kafka_2.11-0.10.2.0"
 cd $KAFKA_DIR
 
 #Start the kafka consumer for output stream of in-situ processing 
-sudo ./bin/kafka-console-consumer.sh --topic $topicName --bootstrap-server $bootstrapServers --from-beginning
+./bin/kafka-console-consumer.sh --topic $topicName --bootstrap-server $bootstrapServers --from-beginning
 
 
-./bin/kafka-console-consumer.sh --topic ais_messages_in_situ_processing_out --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092 --from-beginning
+#./bin/kafka-console-consumer.sh --topic ais_messages_in_situ_processing_out --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092 --from-beginning
 
-./bin/kafka-console-consumer.sh --topic ais_messages_in_situ_processing_out --bootstrap-server localhost:9095,localhost:9093,localhost:9094--from-beginning
+#./bin/kafka-console-consumer.sh --topic ais_messages_in_situ_processing_out --bootstrap-server localhost:9095,localhost:9093,localhost:9094--from-beginning
 
 
-python3 kafkatunnel.py manual ehabq@datacron2.ds.unipi.gr 192.168.1.2,192.168.1.3,192.168.1.5 192.168.1.2,192.168.1.3,192.168.1.5
-
-./kafkaTunnel.sh --remote-machine ehabq@datacron2.ds.unipi.gr --zookeeper 192.168.1.2:2181,192.168.1.3:2181,192.168.1.5:2181 --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092
+#./kafkaTunnel.sh --remote-machine ehabq@datacron2.ds.unipi.gr --zookeeper 192.168.1.2:2181,192.168.1.3:2181,192.168.1.5:2181 --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092

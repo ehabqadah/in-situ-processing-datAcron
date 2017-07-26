@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Get the bootstrap servers & toic name from the config.properties file
+# Get the bootstrap servers & topic name from the config.properties file
 IFS=''
 while read line
 do
@@ -26,6 +26,4 @@ cd $KAFKA_DIR
 #Delete the kafka topic of the  output stream of in-situ processing aisInsituIn
 echo  $zookeeper
 
-sudo ./bin/kafka-topics.sh --zookeeper $zookeeper --delete --topic $topicName
-
-bin/kafka-topics.sh --create --zookeeper $zookeeper --replication-factor 1 --partitions 2 --topic $topicName
+./bin/kafka-topics.sh --zookeeper $zookeeper --delete --topic $topicName

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Get the bootstrap servers & toic name from the config.properties file
+# Get the bootstrap servers & topic name from the config.properties file
 IFS=''
 while read line
 do
@@ -26,5 +26,5 @@ cd $KAFKA_DIR
 
 
 #Start the kafka consumer for output stream of in-situ processing 
-sudo ./bin/kafka-console-consumer.sh --topic ais_critical_points  --bootstrap-server $bootstrapServers --from-beginning
+./bin/kafka-console-consumer.sh --topic ais_critical_points  --bootstrap-server $bootstrapServers --from-beginning
 

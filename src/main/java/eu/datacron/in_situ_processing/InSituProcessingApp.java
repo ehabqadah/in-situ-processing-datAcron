@@ -69,7 +69,7 @@ public class InSituProcessingApp {
     DataStream<AisMessage> enrichedAisMessagesStream =
         kaydAisMessagesStreamWithOrder.map(new AisStreamEnricher());
 
-    // enrichedAisMessagesStream.print();
+    //enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka or file
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile,
         outputLineDelimiter, outputFile, outputWriterParallelism);
