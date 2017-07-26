@@ -1,4 +1,4 @@
-package eu.datacron.in_situ_processing.flink.utils;
+package eu.datacron.in_situ_processing.maritime.streams.operators;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -11,30 +11,33 @@ import org.apache.log4j.Logger;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 
 /**
+ * This is a sink to write a stream of AIS messages to file in CSV format
+ * 
  * @author ehab.qadah
  */
-public final class AisMessagesFileWriter extends RichSinkFunction<AisMessage> {
+public final class AisMessagesToFileSinkWriter extends RichSinkFunction<AisMessage> {
 
   private static final long serialVersionUID = -3639226717442955215L;
-  static Logger logger = Logger.getLogger(AisMessagesFileWriter.class.getName());
-  
+  static Logger logger = Logger.getLogger(AisMessagesToFileSinkWriter.class.getName());
+
   private SerializationSchema<AisMessage> serializationSchema;
   private String filePath;
 
-  public AisMessagesFileWriter() {}
+  public AisMessagesToFileSinkWriter() {}
 
-  public AisMessagesFileWriter(String filePath, SerializationSchema<AisMessage> aisMessageSchema) {
+  public AisMessagesToFileSinkWriter(String filePath,
+      SerializationSchema<AisMessage> aisMessageSchema) {
     this.serializationSchema = aisMessageSchema;
     this.filePath = filePath;
-    
-   
+
+
   }
 
   @Override
   public void invoke(AisMessage value) throws Exception {
 
-      byte[] messageBytes = serializationSchema.serialize(value);
-      Files.write(Paths.get(this.filePath), messageBytes, StandardOpenOption.APPEND);
+    byte[] messageBytes = serializationSchema.serialize(value);
+    Files.write(Paths.get(this.filePath), messageBytes, StandardOpenOption.APPEND);
 
   }
 }

@@ -1,4 +1,4 @@
-package eu.datacron.in_situ_processing.flink.utils;
+package eu.datacron.in_situ_processing.maritime.streams.operators;
 
 import java.nio.charset.StandardCharsets;
 
@@ -14,15 +14,15 @@ import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
  * 
  * @author ehab.qadah
  */
-public final class CSVLineToAISMessageMapper implements FlatMapFunction<String, AisMessage> {
+public final class CsvLineToAisMessageMapper implements FlatMapFunction<String, AisMessage> {
 
   private static final long serialVersionUID = -7969686242238108964L;
   DeserializationSchema<AisMessage> deserializationSchema;
 
-  public CSVLineToAISMessageMapper() {}
+  public CsvLineToAisMessageMapper() {}
 
   // map a csv line to AISMessage using the AIS messages deserialization schema
-  public CSVLineToAISMessageMapper(String parsingJsonConfigs) {
+  public CsvLineToAisMessageMapper(String parsingJsonConfigs) {
     deserializationSchema = new AisMessageCsvSchema(parsingJsonConfigs);
   }
 
@@ -34,6 +34,5 @@ public final class CSVLineToAISMessageMapper implements FlatMapFunction<String, 
     if (deserializedValue != null) {
       out.collect(deserializedValue);
     }
-
   }
 }

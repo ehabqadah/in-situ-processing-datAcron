@@ -41,12 +41,9 @@ public class ReflectionUtils {
         return (int) 0;
       }
       return Integer.parseInt(fieldStringValue);
-
     }
-
     return fieldStringValue;
   }
-
 
   /**
    * Private constructor to prevent instantiation.

@@ -16,6 +16,7 @@ package eu.datacron.in_situ_processing;
  */
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.flink.api.common.functions.MapFunction;
@@ -38,19 +39,23 @@ import eu.datacron.in_situ_processing.maritime.streams.operators.AisStreamEnrich
 
 public class InSituProcessingApp {
 
-
   private static Configs configs = Configs.getInstance();
 
   public static void main(String[] args) throws Exception {
     boolean writeOnlyToFile = args.length > 0;
 
+    String cehkPointsPath =
+        Paths.get(configs.getStringProp("flinkCheckPointsPath") + "/" + System.currentTimeMillis())
+            .toUri().toString();
     // set up the execution environment
-    final StreamExecutionEnvironment env = new StreamExecutionEnvBuilder().build();
+    final StreamExecutionEnvironment env =
+        new StreamExecutionEnvBuilder().setStateBackend(cehkPointsPath).build();
 
     StreamSourceType streamSource =
         StreamSourceType.valueOf(configs.getStringProp("streamSourceType").toUpperCase());
     String outputLineDelimiter = configs.getStringProp("outputLineDelimiter");
-
+    String outputFile = configs.getStringProp("outputFilePath");
+    int outputWriterParallelism = configs.getIntProp("writeOutputParallelism");
     // Get the json config for parsing the raw input stream
     String parsingConfig = AppUtils.getParsingJsonConfig();
 
@@ -62,35 +67,30 @@ public class InSituProcessingApp {
 
     // kaydAisMessagesStream.print();
     DataStream<AisMessage> enrichedAisMessagesStream =
-        kaydAisMessagesStreamWithOrder.flatMap(new AisStreamEnricher());
-
+        kaydAisMessagesStreamWithOrder.map(new AisStreamEnricher());
 
     // enrichedAisMessagesStream.print();
     // write the enriched stream to Kafka or file
     writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOnlyToFile,
-        outputLineDelimiter);
+        outputLineDelimiter, outputFile, outputWriterParallelism);
 
     // execute program
     env.execute("datAcron In-Situ Processing " + AppUtils.getAppVersion());
-
   }
 
   private static KeyedStream<AisMessage, Tuple> setupOrderStream(
       KeyedStream<AisMessage, Tuple> kaydAisMessagesStream) {
-    return kaydAisMessagesStream;
+    return kaydAisMessagesStream.process(new AisMessagesStreamSorter()).keyBy("id");
   }
 
   private static void writeEnrichedStream(DataStream<AisMessage> enrichedAisMessagesStream,
-      String parsingConfig, boolean writeOnlyToFile, String outputLineDelimiter) throws IOException {
-
-
-    String outputFile = configs.getStringProp("outputFilePath");
+      String parsingConfig, boolean writeOnlyToFile, String outputLineDelimiter, String outputFile,
+      int writeParallelism) throws IOException {
 
     // enrichedAisMessagesStream.addSink(
     // new AisMessagesFileWriter(outputFile, new AisMessageCsvSchema(parsingConfig, true)));
-
-    enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter)).writeAsText(
-        outputFile, WriteMode.OVERWRITE);
+    enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter))
+        .writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(writeParallelism);
     if (!writeOnlyToFile) {
       // Write to Kafka
       Properties producerProps = AppUtils.getKafkaProducerProperties();
@@ -100,11 +100,10 @@ public class InSituProcessingApp {
           FlinkKafkaProducer010.writeToKafkaWithTimestamps(enrichedAisMessagesStream,
               outputStreamTopic, new AisMessageCsvSchema(parsingConfig, outputLineDelimiter),
               producerProps);
-
       // the following is necessary for at-least-once delivery guarantee
       myProducerConfig.setLogFailuresOnly(false); // "false" by default
       myProducerConfig.setFlushOnCheckpoint(true); // "false" by default
-
+      myProducerConfig.setParallelism(writeParallelism);
     }
   }
 
@@ -131,8 +130,7 @@ public class InSituProcessingApp {
     // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them
     // based on the message ID (MMSI for vessels)
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
-        aisMessagesStreamWithTimeStamp.keyBy("id");// .process(new AisMessagesStreamSorter())
-    // .keyBy("id");
+        aisMessagesStreamWithTimeStamp.keyBy("id");
     return kaydAisMessagesStream;
   }
 
@@ -151,7 +149,6 @@ public class InSituProcessingApp {
       default:
         return null;
     }
-
   }
 
   /**

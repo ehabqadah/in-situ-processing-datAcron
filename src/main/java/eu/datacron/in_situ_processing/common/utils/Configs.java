@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 /**
  * Configurations wrapper
  * 
@@ -15,41 +17,42 @@ import java.util.Properties;
 public class Configs implements Serializable {
 
 
+  private static final String CONFIG_PROPERTIES_FILE = "/config.properties";
+  static Logger logger = Logger.getLogger(Configs.class.getName());
   private static final long serialVersionUID = 3829172077808658556L;
 
   private Configs(Properties props) {
     this.props = props;
   }
 
-  private static Configs _instance = null;
+  private static Configs singleTonInstance = null;
 
   private Properties props;
 
   public static Configs getInstance() {
 
-    if (_instance == null) {
+    if (singleTonInstance == null) {
       Properties props = new Properties();
       InputStream input = null;
 
       try {
-        input = Configs.class.getResourceAsStream("/config.properties");
+        input = Configs.class.getResourceAsStream(CONFIG_PROPERTIES_FILE);
         // load a properties file
         props.load(input);
-        _instance = new Configs(props);
+        singleTonInstance = new Configs(props);
       } catch (IOException ex) {
-        ex.printStackTrace();
+        logger.error(ex.getMessage(), ex);
       } finally {
         if (input != null) {
           try {
             input.close();
           } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
           }
         }
       }
-
     }
-    return _instance;
+    return singleTonInstance;
   }
 
   public String getStringProp(String propName) {
