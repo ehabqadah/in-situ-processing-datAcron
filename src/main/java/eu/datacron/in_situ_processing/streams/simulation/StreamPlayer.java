@@ -13,8 +13,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This class is responsible to simulate/replay the raw message stream by delay sending some records
@@ -26,10 +25,12 @@ public class StreamPlayer extends
     RichMapFunction<Tuple3<String, Long, String>, Tuple3<String, Long, String>> {
 
   private static final long serialVersionUID = -8094032551260660913L;
-  private static final Logger logger = LoggerFactory.getLogger(RawStreamMapper.class.getName());
+  static Logger logger = Logger.getLogger(StreamPlayer.class.getName());
+
   // --------------------------------------------------------------------------------------------
   // Fields
   // --------------------------------------------------------------------------------------------
+
   private Properties kafkaProps;
   private transient Producer<String, String> producer;
   private String topicName;
@@ -49,30 +50,23 @@ public class StreamPlayer extends
   }
 
   @Override
-  public Tuple3<String, Long, String> map(Tuple3<String, Long, String> rawMessageTuple) {
-    long delay;
-    try {
-      delay = getSimulatedTimeDelayBetweenRawMessages(rawMessageTuple);
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      delay = 0;
-    }
+  public Tuple3<String, Long, String> map(Tuple3<String, Long, String> rawMessageTuple)
+      throws Exception {
+    long delay = getSimulatedTimeDelayBetweenRawMessages(rawMessageTuple);
     // write the message to Kafka after the delay
     writeRawMessageWithDelay(rawMessageTuple, delay);
     return rawMessageTuple;
   }
-
 
   /**
    * Find the delay between the new raw message and the last received one
    * 
    * @param rawMessageTuple
    * @return
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws Exception
    */
   private long getSimulatedTimeDelayBetweenRawMessages(Tuple3<String, Long, String> rawMessageTuple)
-      throws IOException, InterruptedException {
+      throws Exception {
     // access the state value
     long currentPointTimestamp = rawMessageTuple.f1;
     long lastPointTimeStamp =
@@ -81,14 +75,14 @@ public class StreamPlayer extends
     long delay = (long) ((currentPointTimestamp - lastPointTimeStamp) * simulationWaitingScale);
 
     if (delay < 0) {
-      logger.error("negative delay" + delay + "for " + rawMessageTuple + " old timestamp"
-          + lastTimestamp);
+      String errorMessage =
+          "negative delay" + delay + "for " + rawMessageTuple + " old timestamp" + lastTimestamp;
+      logger.error(errorMessage);
     }
     return delay;
   }
 
   private void setupProducer() {
-
     // Override key & value serialization classes
     kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
     kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -98,7 +92,7 @@ public class StreamPlayer extends
   public void writeRawMessageWithDelay(Tuple3<String, Long, String> rawMessageTuple, long writeDelay) {
 
     if (writeDelay == 0) {
-      // send the message to Kafka with creating thread
+      // send the message to Kafka with creating a thread
       writeMessageToKafka(rawMessageTuple);
       return;
     }
@@ -143,7 +137,7 @@ public class StreamPlayer extends
     String id = rawMessageTuple.f0;
     // send the record to Kafka
     producer.send(new ProducerRecord<String, String>(topicName, id, rawMessage));
-    logger.info("Send a raw message:" + rawMessage);
+    //logger.info("Send a raw message:" + rawMessage);
   }
 
   @Override
