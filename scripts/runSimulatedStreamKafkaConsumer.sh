@@ -26,5 +26,5 @@ cd $KAFKA_DIR
 
 
 #Start the kafka consumer for output stream of in-situ processing 
-./bin/kafka-console-consumer.sh --topic ais_critical_points  --bootstrap-server $bootstrapServers --from-beginning
+./bin/kafka-console-consumer.sh --topic  $topicName --bootstrap-server $bootstrapServers --from-beginning
 

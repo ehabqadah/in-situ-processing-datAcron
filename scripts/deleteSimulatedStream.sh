@@ -24,9 +24,7 @@ KAFKA_DIR="/home/ehabqadah/frameworks/kafka_2.11-0.10.2.0"
 cd $KAFKA_DIR
 
 #Delete the kafka topic of the  output stream of in-situ processing aisInsituIn
-echo  $zookeeper
 
-sudo ./bin/kafka-topics.sh --zookeeper $zookeeper --delete --topic ais_critical_points
+./bin/kafka-topics.sh --zookeeper $zookeeper --delete --topic $topicName
 
-bin/kafka-topics.sh --create --zookeeper $zookeeper --replication-factor 1 --partitions 2 --topic ais_critical_points
 

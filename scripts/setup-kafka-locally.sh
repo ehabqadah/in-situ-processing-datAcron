@@ -7,7 +7,7 @@ cd $KAFKA_DIR
  bin/zookeeper-server-stop.sh
 
 # start zookeeper
-sudo  bin/zookeeper-server-start.sh config/zookeeper.properties &
+ bin/zookeeper-server-start.sh config/zookeeper.properties &
 
 
 sleep 5
