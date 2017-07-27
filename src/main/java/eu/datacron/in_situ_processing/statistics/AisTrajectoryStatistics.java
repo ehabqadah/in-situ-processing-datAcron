@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
 // import com.google.common.collect.Lists;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 
@@ -157,10 +158,10 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
 
     if (timeDiff < 0) {
-      System.out.println("**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp
-          + "timeDiff=" + timeDiff);
-      throw new Exception("**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp
-          + "timeDiff=" + timeDiff);
+      String outOfOrderErrorMesage = "**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp
+          + "timeDiff=" + timeDiff;
+      System.out.println(outOfOrderErrorMesage);
+      throw new Exception(outOfOrderErrorMesage);
     }
 
     setLastDiffTime(timeDiff);

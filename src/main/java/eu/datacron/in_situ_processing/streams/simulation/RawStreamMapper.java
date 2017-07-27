@@ -35,7 +35,6 @@ public class RawStreamMapper implements FlatMapFunction<String, Tuple3<String, L
     }
   }
 
-
   /**
    * Extract the message id & timestamp
    * 

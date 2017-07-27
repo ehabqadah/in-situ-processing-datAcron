@@ -47,6 +47,7 @@ public class AppUtils {
         FlinkKafkaConsumer010<AisMessage> kafkaConsumer =
             new FlinkKafkaConsumer010<AisMessage>(configs.getStringProp(filePathOrTopicProperty),
                 new AisMessageCsvSchema(parsingConfig, outputLineDelimiter), kafakaProps);
+        
         // kafkaConsumer.assignTimestampsAndWatermarks(arg0)
         aisMessagesStream = env.addSource(kafkaConsumer);
         break;
