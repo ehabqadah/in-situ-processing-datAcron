@@ -2,7 +2,7 @@ package eu.datacron.in_situ_processing.maritime;
 
 import java.io.Serializable;
 
-import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
+import eu.datacron.in_situ_processing.maritime.statistics.StatisticsWrapper;
 
 /**
  * @author ehab.qadah

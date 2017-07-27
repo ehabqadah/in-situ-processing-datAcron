@@ -1,4 +1,4 @@
-package eu.datacron.in_situ_processing.statistics;
+package eu.datacron.in_situ_processing.maritime.statistics;
 
 import java.io.Serializable;
 import java.util.ArrayList;

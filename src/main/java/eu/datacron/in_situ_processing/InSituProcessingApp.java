@@ -32,7 +32,6 @@ import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.StreamExecutionEnvBuilder;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
-import eu.datacron.in_situ_processing.maritime.streams.operators.AISMessagesTimeAssigner;
 import eu.datacron.in_situ_processing.maritime.streams.operators.AisMessagesStreamSorter;
 import eu.datacron.in_situ_processing.maritime.streams.operators.AisStreamEnricher;
 
@@ -122,15 +121,12 @@ public class InSituProcessingApp {
         AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),
             parsingConfig, outputLineDelimiter);
 
-    // Assign the timestamp of the AIS messages based on their timestamps
-    DataStream<AisMessage> aisMessagesStreamWithTimeStamp =
-        aisMessagesStream.assignTimestampsAndWatermarks(new AISMessagesTimeAssigner());
     // aisMessagesStream.print();
 
     // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them
     // based on the message ID (MMSI for vessels)
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
-        aisMessagesStreamWithTimeStamp.keyBy("id");
+        aisMessagesStream.keyBy("id");
     return kaydAisMessagesStream;
   }
 

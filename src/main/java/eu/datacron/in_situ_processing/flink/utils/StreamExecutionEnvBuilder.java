@@ -17,7 +17,8 @@ import org.apache.flink.runtime.state.filesystem.FsStateBackend;
  *
  */
 public class StreamExecutionEnvBuilder {
-
+  // number of jobs restart attempts
+  private static final int DEFAULT_NUMBER_JOB_RESTART = 2;
   private StreamExecutionEnvironment env;
 
   public StreamExecutionEnvBuilder() throws IOException {
@@ -32,7 +33,7 @@ public class StreamExecutionEnvBuilder {
     setAutoWatermarkInterval(1000);
     env.setBufferTimeout(1000);
     env.getConfig().setExecutionMode(ExecutionMode.PIPELINED);
-    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(2, // number of restart attempts
+    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(DEFAULT_NUMBER_JOB_RESTART,
         Time.of(10, TimeUnit.SECONDS) // delay
         ));
   }
@@ -54,7 +55,13 @@ public class StreamExecutionEnvBuilder {
     return this;
   }
 
+  public StreamExecutionEnvBuilder disableJobsRestart() {
+    env.setRestartStrategy(RestartStrategies.noRestart());
+    return this;
+  }
+
   public StreamExecutionEnvironment build() {
     return env;
   }
+
 }

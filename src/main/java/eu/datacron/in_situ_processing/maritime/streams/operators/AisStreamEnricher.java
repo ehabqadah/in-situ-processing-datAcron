@@ -8,8 +8,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
 
 import eu.datacron.in_situ_processing.maritime.AisMessage;
-import eu.datacron.in_situ_processing.statistics.AisTrajectoryStatistics;
-import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
+import eu.datacron.in_situ_processing.maritime.statistics.AisTrajectoryStatistics;
+import eu.datacron.in_situ_processing.maritime.statistics.StatisticsWrapper;
 
 /**
  * This a map operator that processes the AIS messages stream and enrich it with new derived

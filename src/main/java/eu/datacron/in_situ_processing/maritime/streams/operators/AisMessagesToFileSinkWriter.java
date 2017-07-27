@@ -29,8 +29,6 @@ public final class AisMessagesToFileSinkWriter extends RichSinkFunction<AisMessa
       SerializationSchema<AisMessage> aisMessageSchema) {
     this.serializationSchema = aisMessageSchema;
     this.filePath = filePath;
-
-
   }
 
   @Override
@@ -38,6 +36,5 @@ public final class AisMessagesToFileSinkWriter extends RichSinkFunction<AisMessa
 
     byte[] messageBytes = serializationSchema.serialize(value);
     Files.write(Paths.get(this.filePath), messageBytes, StandardOpenOption.APPEND);
-
   }
 }

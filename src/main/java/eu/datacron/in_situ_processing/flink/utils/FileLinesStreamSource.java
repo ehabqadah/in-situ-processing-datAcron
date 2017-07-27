@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileLinesStreamSource implements SourceFunction<String> {
 
-  private static final int BOOTSTRAP_TIME = 1 * 30 * 1000;
+  private static final int BOOTSTRAP_TIME = 2 * 60 * 1000;
   private static final long serialVersionUID = 2174904787118597072L;
   static Logger logger = LoggerFactory.getLogger(FileLinesStreamSource.class.getName());
   private String dataFilePath;

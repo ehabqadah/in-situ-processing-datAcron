@@ -3,7 +3,7 @@ package eu.datacron.in_situ_processing.maritime;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.datacron.in_situ_processing.statistics.StatisticsWrapper;
+import eu.datacron.in_situ_processing.maritime.statistics.StatisticsWrapper;
 
 /**
  * AIS (Automatic Identification System) message wrapper.

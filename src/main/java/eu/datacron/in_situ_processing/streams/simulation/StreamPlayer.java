@@ -1,6 +1,5 @@
 package eu.datacron.in_situ_processing.streams.simulation;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -11,7 +10,6 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.log4j.Logger;
 
@@ -32,7 +30,7 @@ public class StreamPlayer extends
   // --------------------------------------------------------------------------------------------
 
   private Properties kafkaProps;
-  private transient Producer<String, String> producer;
+  private transient KafkaProducer<String, String> producer;
   private String topicName;
   /**
    * The ValueState handle for the last timestamp of a trajectory
@@ -120,8 +118,6 @@ public class StreamPlayer extends
       // send the message to Kafka anyway
       writeMessageToKafka(rawMessageTuple);
     }
-
-
   }
 
   /**
@@ -136,8 +132,11 @@ public class StreamPlayer extends
     String rawMessage = rawMessageTuple.f2;
     String id = rawMessageTuple.f0;
     // send the record to Kafka
-    producer.send(new ProducerRecord<String, String>(topicName, id, rawMessage));
-    //logger.info("Send a raw message:" + rawMessage);
+    ProducerRecord<String, String> record =
+        new ProducerRecord<String, String>(topicName, id, rawMessage);
+    producer.send(record);
+
+    // logger.info("Send a raw message:" + rawMessage);
   }
 
   @Override

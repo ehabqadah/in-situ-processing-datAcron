@@ -44,21 +44,27 @@ public final class AisMessagesStreamSorter extends ProcessFunction<AisMessage, A
 
     TimerService timerService = context.timerService();
 
+    PriorityQueue<AisMessage> queue = queueState.value();
+    if (queue == null) {
+      queue = new PriorityQueue<>(15, new PositionMessagesComparator());
+    }
+
     if (context.timestamp() > timerService.currentWatermark()) {
-      PriorityQueue<AisMessage> queue = queueState.value();
-      if (queue == null) {
-        queue = new PriorityQueue<>(15, new PositionMessagesComparator());
-      }
       queue.add(message);
       queueState.update(queue);
       // register a timer to be fired when the watermark passes this message timestamp
       timerService.registerEventTimeTimer(message.timestamp);
-      // out.collect(message);
     } else {
-      logger.info("out of order message: " + message.toString());
-      throw new Exception("out of order message: " + message.toString());
+      // logger.info("out of order message: " + message.toString());
+      // throw new Exception(timerService.currentWatermark() + "out of order message: "
+      // + message.toString());
+      if (queue.size() == 0) {
+        out.collect(message);
+      } else {
+        queue.add(message);
+        queueState.update(queue);
+      }
     }
-
   }
 
   @Override

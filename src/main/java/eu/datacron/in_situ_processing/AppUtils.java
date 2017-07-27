@@ -15,6 +15,7 @@ import eu.datacron.in_situ_processing.common.utils.Configs;
 import eu.datacron.in_situ_processing.flink.utils.FileLinesStreamSource;
 import eu.datacron.in_situ_processing.maritime.AisMessage;
 import eu.datacron.in_situ_processing.maritime.AisMessageCsvSchema;
+import eu.datacron.in_situ_processing.maritime.streams.operators.AISMessagesTimeAssigner;
 import eu.datacron.in_situ_processing.maritime.streams.operators.CsvLineToAisMessageMapper;
 
 
@@ -47,19 +48,22 @@ public class AppUtils {
         FlinkKafkaConsumer010<AisMessage> kafkaConsumer =
             new FlinkKafkaConsumer010<AisMessage>(configs.getStringProp(filePathOrTopicProperty),
                 new AisMessageCsvSchema(parsingConfig, outputLineDelimiter), kafakaProps);
-        
-        // kafkaConsumer.assignTimestampsAndWatermarks(arg0)
+
+        kafkaConsumer.assignTimestampsAndWatermarks(new AISMessagesTimeAssigner());
         aisMessagesStream = env.addSource(kafkaConsumer);
         break;
       case FILE:
 
-        aisMessagesStream =
+        DataStream<AisMessage> aisMessagesStreamWithoutTime =
             env.addSource(
                 new FileLinesStreamSource(configs.getStringProp(filePathOrTopicProperty),
-                    parsingConfig))
-                .flatMap(new CsvLineToAisMessageMapper(parsingConfig)).setParallelism(1);
-        // env.readTextFile(configs.getStringProp(filePathOrTopicProperty)).flatMap(
-        // new CSVLineToAISMessageMapper(parsingConfig));
+                    parsingConfig)).flatMap(new CsvLineToAisMessageMapper(parsingConfig))
+                .setParallelism(1);
+
+        // Assign the timestamp of the AIS messages based on their timestamps
+        aisMessagesStream =
+            aisMessagesStreamWithoutTime
+                .assignTimestampsAndWatermarks(new AISMessagesTimeAssigner());
 
         break;
     }
