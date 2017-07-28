@@ -3,6 +3,8 @@ package eu.datacron.in_situ_processing.common.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -16,10 +18,12 @@ import org.apache.log4j.Logger;
 
 public class Configs implements Serializable {
 
+  private static final long serialVersionUID = 3829172077808658556L;
 
   private static final String CONFIG_PROPERTIES_FILE = "/config.properties";
   static Logger logger = Logger.getLogger(Configs.class.getName());
-  private static final long serialVersionUID = 3829172077808658556L;
+  /** A delimiter for multiple values of the same config parameter **/
+  public static final String MUTIL_VALUES_DELIMITER = ",";
 
   private Configs(Properties props) {
     this.props = props;
@@ -55,19 +59,50 @@ public class Configs implements Serializable {
     return singleTonInstance;
   }
 
+  /**
+   * Get a string value property
+   * 
+   * @param propName
+   * @return
+   */
   public String getStringProp(String propName) {
 
     return this.props.getProperty(propName);
   }
 
+  /**
+   * Get integer value property
+   * 
+   * @param propName
+   * @return
+   */
   public int getIntProp(String propName) {
 
     return Integer.parseInt(this.props.getProperty(propName));
   }
+
+  /**
+   * Get double value property
+   * 
+   * @param propName
+   * @return
+   */
 
   public double getDoubleProp(String propName) {
 
     return Double.parseDouble(this.props.getProperty(propName));
   }
 
+  /**
+   * Get list value property
+   * 
+   * @param propName
+   * @return
+   */
+  public List<String> getListProp(String propertyName) {
+
+    String value = getStringProp(propertyName);
+    return Arrays.asList(value.split(MUTIL_VALUES_DELIMITER));
+
+  }
 }
