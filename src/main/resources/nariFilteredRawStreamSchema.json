@@ -1,0 +1,14 @@
+{  
+   "doc":"This schema defines the indices of AIS attributes in the input csv file, this schema for the NARI files.",
+   "id":1,
+   "status":2,
+   "turn":3,
+   "speed":4,
+   "course":5,
+   "heading":6,
+   "longitude":7,
+   "latitude":8,
+   "timestamp":9,
+   "format":"csv",
+   "delimiter":","
+}
