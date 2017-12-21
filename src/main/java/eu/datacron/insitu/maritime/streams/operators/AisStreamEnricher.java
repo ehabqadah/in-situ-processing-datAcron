@@ -54,7 +54,7 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
         statisticsOfTrajectory.value() == null ? new AisTrajectoryStatistics()
             : statisticsOfTrajectory.value();
 
-    // compute new statistics attributes for the new received position message
+    // Compute new statistics attributes for the new received position message
     curreStatistics.processNewPosition(value);
 
     updateAreaInfo(value, curreStatistics);
@@ -72,7 +72,7 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     for (Area area : areas) {
       if (GeoUtils.isPointInPolygon(area.getPolygon(), value.getLongitude(), value.getLatitude())) {
         detectedAreas.add(area.getId());
-        // System.out.println(area.getId());
+
       }
     }
     boolean changeInArea = false;

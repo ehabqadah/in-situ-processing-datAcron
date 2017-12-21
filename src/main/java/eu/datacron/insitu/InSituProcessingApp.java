@@ -19,8 +19,9 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -38,6 +39,12 @@ import eu.datacron.insitu.maritime.AisMessageCsvSchema;
 import eu.datacron.insitu.maritime.streams.operators.AisMessagesStreamSorter;
 import eu.datacron.insitu.maritime.streams.operators.AisStreamEnricher;
 
+/**
+ * The in-situ main driver app
+ * 
+ * @author ehab.qadah
+ *
+ */
 
 public class InSituProcessingApp {
 
@@ -82,7 +89,17 @@ public class InSituProcessingApp {
         outputLineDelimiter, outputPath, outputStreamTopic);
 
     // Execute program
-    env.execute("datAcron In-Situ Processing " + appVersion);
+
+    System.out.println(env.getExecutionPlan());
+
+    JobExecutionResult executionResult = null;
+    try {
+      executionResult = env.execute("datAcron In-Situ Processing " + appVersion);
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
+
+    System.out.println("Full execution time=" + executionResult.getNetRuntime(TimeUnit.MINUTES));
   }
 
   private static KeyedStream<AisMessage, Tuple> setupOrderStream(
@@ -106,8 +123,8 @@ public class InSituProcessingApp {
             outputStreamTopic, new AisMessageCsvSchema(parsingConfig, outputLineDelimiter),
             producerProps);
     // the following is necessary for at-least-once delivery guarantee
-    myProducerConfig.setLogFailuresOnly(false); // "false" by default
-    myProducerConfig.setFlushOnCheckpoint(true); // "false" by default
+    myProducerConfig.setLogFailuresOnly(false);
+    myProducerConfig.setFlushOnCheckpoint(true);
 
   }
 
@@ -145,32 +162,10 @@ public class InSituProcessingApp {
         return "aisDataSetFilePath";
       case KAFKA:
         return "inputStreamTopicName";
+      case HDFS:
+        return "aisDataSetHDFSFilePath";
       default:
         return null;
-    }
-  }
-
-  /**
-   * A map operator of AIS messages to CSV format
-   * 
-   * @author ehab.qadah
-   *
-   */
-  public static final class AisMessagesToCsvMapper implements MapFunction<AisMessage, String> {
-
-    private static final long serialVersionUID = 5306666449608883748L;
-    private String delimiter;
-
-    public AisMessagesToCsvMapper() {}
-
-    public AisMessagesToCsvMapper(String outputLineDelimiter) {
-      this.delimiter = outputLineDelimiter;
-    }
-
-    @Override
-    public String map(AisMessage value) throws Exception {
-
-      return value.toCsv(delimiter);
     }
   }
 }

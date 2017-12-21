@@ -74,7 +74,7 @@ public class GeoUtils {
    **/
   public static double distance(double lat1, double lat2, double lon1, double lon2, double altit1,
       double altit2) {
- int R = 6371; // Radius of the earth
+    int r = 6371; // Radius of the earth
 
     Double latDistance = Math.toRadians(lat2 - lat1);
     Double lonDistance = Math.toRadians(lon2 - lon1);
@@ -83,7 +83,7 @@ public class GeoUtils {
             * Math.cos(Math.toRadians(lat2)) * Math.sin(lonDistance / 2)
             * Math.sin(lonDistance / 2);
     Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    double distance = R * c * 1000; // convert to meters
+    double distance = r * c * 1000; // convert to meters
 
     double height = altit1 - altit2;
 

@@ -1,20 +1,19 @@
 package eu.datacron.insitu.maritime.statistics;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-
-// import com.google.common.collect.Lists;
 
 import eu.datacron.insitu.maritime.AisMessage;
 
 /**
+ * A class to aggregate the ais messages statistics
+ * 
  * @author ehab.qadah
  */
 public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
 
+  private static final int MIN_NUMBER_OF_PPINTS_BEFORE_COMPUTE_VARIANCE = 2;
   private static final long serialVersionUID = -4223639731431853133L;
   private double onlineSpeedMean;
   private double aggregatedSumOfSquaresMeanDiffs;
@@ -74,13 +73,13 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
 
   private void processNewAisMessage(AisMessage aisMessage) throws Exception {
 
-    // System.out.println(aisMessage);
+
     if (getNumberOfPoints() == 0) {
       initStatisticsAttributes(aisMessage);
     }
-    // update location related attributes
+    // Update location related attributes
     updateLocationAttributes(aisMessage);
-    // update time related attributes
+    // Update time related attributes
     updateTimeAttributes(aisMessage);
     updateSpeedAttributes(aisMessage);
     increasePointssCount();
@@ -140,13 +139,16 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
       setAggregatedSumOfSquaresMeanDiffs(0.0);
     }
     n += 1;
-    double delta = newSpeed - getOnlineSpeedMean(); // new speed -old mean
-    setOnlineSpeedMean(getOnlineSpeedMean() + delta / n); // new sample mean
-    double delta2 = newSpeed - getOnlineSpeedMean();// new speed -new mean
+    // new speed -old mean
+    double delta = newSpeed - getOnlineSpeedMean();
+    // new sample mean
+    setOnlineSpeedMean(getOnlineSpeedMean() + delta / n);
+    // new speed -new mean
+    double delta2 = newSpeed - getOnlineSpeedMean();
     // update the sum of squares differences of speeds from mean
     setAggregatedSumOfSquaresMeanDiffs(getAggregatedSumOfSquaresMeanDiffs() + delta * delta2);
 
-    if (n < 2) {
+    if (n < MIN_NUMBER_OF_PPINTS_BEFORE_COMPUTE_VARIANCE) {
       setVarianceSpeed(0.0);
     } else {
       double variance = getAggregatedSumOfSquaresMeanDiffs() / (n - 1);
@@ -159,20 +161,21 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     long oldTimestamp = getLastTimestamp();
     long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
 
-//    if (timeDiff < 0) {
-//      String outOfOrderErrorMesage = "**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp
-//          + "timeDiff=" + timeDiff;
-//      System.out.println(outOfOrderErrorMesage);
-//      throw new Exception(outOfOrderErrorMesage);
-//    }
+    // if (timeDiff < 0) {
+    // String outOfOrderErrorMesage = "**** error key=" + aisMessage.getId() + "newTimestamp" +
+    // newTimestamp
+    // + "timeDiff=" + timeDiff;
+    // System.out.println(outOfOrderErrorMesage);
+    // throw new Exception(outOfOrderErrorMesage);
+    // }
 
     setLastDiffTime(timeDiff);
     setMaxDiffTime(timeDiff);
-    // don't update the min for the first message
+    // no update the min for the first message
     if (getNumberOfPoints() > 0) {
       setMinDiffTime(timeDiff);
     }
-    // set the message's timestamp as the last seen timestamp
+    // Set the message's timestamp as the last seen timestamp
     setLastTimestamp(newTimestamp);
 
     // update time difference average
@@ -215,8 +218,9 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
         + delimiter + getMinSpeed() + delimiter + getAverageSpeed() + delimiter
         + getVarianceSpeed() + delimiter + getMinLong() + delimiter + getMaxLong() + delimiter
         + getMinLat() + delimiter + getMaxLat() + delimiter + getMinturn() + delimiter
-        + getMaxturn() + delimiter + getMinHeading() + delimiter + getMaxHeading()+delimiter+isChangeInArea()+delimiter+getDetectedAreasStr();
+        + getMaxturn() + delimiter + getMinHeading() + delimiter + getMaxHeading() + delimiter
+        + isChangeInArea() + delimiter + getDetectedAreasStr();
   }
 
- 
+
 }

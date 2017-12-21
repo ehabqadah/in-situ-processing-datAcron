@@ -19,7 +19,6 @@ import eu.datacron.insitu.maritime.streams.operators.AISMessagesTimeAssigner;
 import eu.datacron.insitu.maritime.streams.operators.CsvLineToAisMessageMapper;
 
 
-
 /**
  * @author ehab.qadah
  */
@@ -66,6 +65,14 @@ public class AppUtils {
                 .assignTimestampsAndWatermarks(new AISMessagesTimeAssigner());
 
         break;
+
+      case HDFS:
+        aisMessagesStream =
+            env.readTextFile(fileOrTopicName).flatMap(new CsvLineToAisMessageMapper(parsingConfig))
+                .assignTimestampsAndWatermarks(new AISMessagesTimeAssigner());
+        break;
+      default:
+        return null;
     }
     return aisMessagesStream;
   }
