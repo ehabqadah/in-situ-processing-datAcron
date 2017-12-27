@@ -7,7 +7,6 @@ do
 prop=$(echo $line | awk -F"=" '{print $1}')   
 set -- $prop
 
-echo $prop
 
 if [ $prop == "bootstrapServers" ]; then
   bootstrapServers=$(echo $line | awk -F"=" '{print $2}')   
@@ -27,7 +26,6 @@ fi
 done < ../src/main/resources/config.properties
 
 
-echo $KAFKA_DIR
 
 cd $KAFKA_DIR
 
