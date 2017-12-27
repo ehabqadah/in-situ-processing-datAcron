@@ -80,6 +80,7 @@ public class InSituProcessingApp {
 
     List<Area> areas = AreasUtils.getAllAreas(ploygonsFilePath);
 
+    System.out.println("number of areas" + areas.size());
     // Set up the execution environment
     final StreamExecutionEnvironment env =
         new StreamExecutionEnvBuilder().setParallelism(parallelism).setStateBackend(cehkPointsPath)

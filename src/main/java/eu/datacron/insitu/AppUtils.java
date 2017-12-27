@@ -113,10 +113,7 @@ public class AppUtils {
    * @return
    */
   private static String readResourceFile(String fileName) {
-    InputStream input;
-    input = Configs.class.getResourceAsStream("/" + fileName);
-
-    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    BufferedReader reader = getResourceReader(fileName);
     StringBuilder out = new StringBuilder();
     String line;
     try {
@@ -128,6 +125,15 @@ public class AppUtils {
       return null;
     }
     return out.toString();
+  }
+
+
+  public static BufferedReader getResourceReader(String fileName) {
+    InputStream input;
+    input = Configs.class.getResourceAsStream("/" + fileName);
+
+    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    return reader;
   }
 
   /**

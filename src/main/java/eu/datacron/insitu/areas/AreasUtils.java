@@ -1,7 +1,6 @@
 package eu.datacron.insitu.areas;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +9,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.vividsolutions.jts.geom.Polygon;
+
+import eu.datacron.insitu.AppUtils;
 
 /**
  * @author ehab.qadah
@@ -30,7 +31,7 @@ public class AreasUtils {
   public static List<Area> getAllAreas(String polygonFilePath) {
     List<Area> areas = new ArrayList<Area>();
 
-    try (BufferedReader br = new BufferedReader(new FileReader(polygonFilePath))) {
+    try (BufferedReader br = AppUtils.getResourceReader(polygonFilePath)) {
       String areaLine;
 
       while ((areaLine = br.readLine()) != null) {
