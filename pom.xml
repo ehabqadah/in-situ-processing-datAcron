@@ -317,7 +317,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>eu.datacron.insitu.HDFSReader</mainClass>
+									<mainClass>eu.datacron.insitu.InSituProcessingApp</mainClass>
 								</transformer>
 							</transformers>
 

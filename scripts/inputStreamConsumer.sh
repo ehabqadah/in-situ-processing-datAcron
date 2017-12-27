@@ -18,12 +18,14 @@ if [ $prop == "inputStreamTopicName" ]; then
 set -- $topicName
 fi
 
+if [ $prop == "kafkaDir" ]; then
+  KAFKA_DIR=$(echo $line | awk -F"=" '{print $2}')   
+set -- $KAFKA_DIR
+fi
+
 done < ../src/main/resources/config.properties
 
-KAFKA_DIR="/home/ehabqadah/frameworks/kafka_2.11-0.10.2.0"
 cd $KAFKA_DIR
-
-
 
 #Start the kafka consumer for output stream of in-situ processing 
 ./bin/kafka-console-consumer.sh --topic  $topicName --bootstrap-server $bootstrapServers --from-beginning

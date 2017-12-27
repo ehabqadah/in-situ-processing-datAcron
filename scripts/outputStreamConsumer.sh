@@ -18,9 +18,15 @@ if [ $prop == "outputStreamTopicName" ]; then
 set -- $topicName
 fi
 
+if [ $prop == "kafkaDir" ]; then
+  KAFKA_DIR=$(echo $line | awk -F"=" '{print $2}')   
+set -- $KAFKA_DIR
+fi
+
 done < ../src/main/resources/config.properties
 
-KAFKA_DIR="/home/ehabqadah/frameworks/kafka_2.11-0.10.2.0"
+
+
 cd $KAFKA_DIR
 
 #Start the kafka consumer for output stream of in-situ processing 
@@ -35,6 +41,6 @@ cd $KAFKA_DIR
 #./kafkaTunnel.sh --remote-machine ehabq@datacron2.ds.unipi.gr --zookeeper 192.168.1.2:2181,192.168.1.3:2181,192.168.1.5:2181 --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092
 
 
- kafkatunnel manual 10.11.85.128,10.11.82.30,10.11.83.9 10.11.80.7,10.11.80.123,10.11.81.13
+ #kafkatunnel manual 10.11.85.128,10.11.82.30,10.11.83.9 10.11.80.7,10.11.80.123,10.11.81.13
  
-  kafkatunnel manual 192.168.1.2:2181,192.168.1.3:2181,192.168.1.5:2181     192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092
+#  kafkatunnel manual 192.168.1.2:2181,192.168.1.3:2181,192.168.1.5:2181     192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092

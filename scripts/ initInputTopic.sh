@@ -13,17 +13,30 @@ if [ $prop == "zookeeper" ]; then
 set -- $zookeeper
 fi
 
-if [ $prop == "outputStreamTopicName" ]; then
+if [ $prop == "inputStreamTopicName" ]; then
   topicName=$(echo $line | awk -F"=" '{print $2}')   
 set -- $topicName
 fi
 
+
+if [ $prop == "kafkaDir" ]; then
+  KAFKA_DIR=$(echo $line | awk -F"=" '{print $2}')   
+set -- $KAFKA_DIR
+fi
+
+
 done < ../src/main/resources/config.properties
 
-KAFKA_DIR="/home/ehabqadah/frameworks/kafka_2.11-0.10.2.0"
+
 cd $KAFKA_DIR
 
-#Delete the kafka topic of the  output stream of in-situ processing aisInsituIn
-echo  $zookeeper
+# Delete the kafka topic of the  output stream of in-situ processing 
+
 
 ./bin/kafka-topics.sh --zookeeper $zookeeper --delete --topic $topicName
+
+
+
+# Re-create the topic 
+
+./bin/kafka-topics.sh --create --zookeeper $zookeeper --replication-factor 1 --partitions 3 --topic $topicName

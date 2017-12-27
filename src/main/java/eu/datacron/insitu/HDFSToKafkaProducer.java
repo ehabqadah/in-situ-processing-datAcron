@@ -14,17 +14,16 @@ import eu.datacron.insitu.common.utils.Configs;
 import eu.datacron.insitu.flink.utils.StreamExecutionEnvBuilder;
 
 /**
- * A Flink hdfs file reader
+ * A Flink hdfs to kafka writer
  * 
  * @author ehab.qadah
  *
  */
-public class HDFSReader {
+public class HDFSToKafkaProducer {
 
   private static Configs configs = Configs.getInstance();
 
   public static void main(String[] args) throws Exception {
-    boolean writeOutputStreamToFile = configs.getBooleanProp("writeOutputStreamToFile");
 
     String cehkPointsPath =
         Paths.get(configs.getStringProp("flinkCheckPointsPath") + "/" + System.currentTimeMillis())
@@ -32,17 +31,18 @@ public class HDFSReader {
 
 
     int parallelism = configs.getIntProp("parallelism");
+    String inputHDFSFile = configs.getStringProp("inputHDFSFilePath");
+    String outputTopicName = configs.getStringProp("outputHDFSKafkaTopic");
 
     // Set up the execution environment
     final StreamExecutionEnvironment env =
         new StreamExecutionEnvBuilder().setParallelism(parallelism).setStateBackend(cehkPointsPath)
             .build();
-
-    DataStreamSource<String> inputTextStream =
-        env.readTextFile("hdfs://dnode1:8020/user/ehabq/sorted_nari_dynamic.csv");
+    // Read the HDFS file
+    DataStreamSource<String> inputTextStream = env.readTextFile(inputHDFSFile);
 
     FlinkKafkaProducer010Configuration<String> myProducerConfig =
-        FlinkKafkaProducer010.writeToKafkaWithTimestamps(inputTextStream, "nari-hdfs",
+        FlinkKafkaProducer010.writeToKafkaWithTimestamps(inputTextStream, outputTopicName,
             new SimpleStringSchema(), AppUtils.getKafkaProducerProperties());
 
 
@@ -53,13 +53,13 @@ public class HDFSReader {
     System.out.println(env.getExecutionPlan());
 
     JobExecutionResult executionResult = null;
+
     try {
-      executionResult = env.execute(" HDFS test");
+      executionResult = env.execute(" HDFS to Kafka stream producer");
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
 
     System.out.println("Full execution time=" + executionResult.getNetRuntime(TimeUnit.MINUTES));
   }
-
 }

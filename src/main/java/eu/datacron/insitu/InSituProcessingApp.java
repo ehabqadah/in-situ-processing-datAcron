@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -110,10 +109,10 @@ public class InSituProcessingApp {
   private static void writeEnrichedStream(DataStream<AisMessage> enrichedAisMessagesStream,
       String parsingConfig, boolean writeOutputStreamToFile, String outputLineDelimiter,
       String outputPath, String outputStreamTopic) throws IOException {
-    if (writeOutputStreamToFile) {
-      enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter)).writeAsText(
-          outputPath, WriteMode.OVERWRITE);
-    }
+    // if (writeOutputStreamToFile) {
+    // enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter)).writeAsText(
+    // outputPath, WriteMode.OVERWRITE);
+    // }
 
     // Write to Kafka
     Properties producerProps = AppUtils.getKafkaProducerProperties();
