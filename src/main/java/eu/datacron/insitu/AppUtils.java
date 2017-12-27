@@ -100,9 +100,21 @@ public class AppUtils {
 
 
   public static String getParsingJsonConfig() {
-    InputStream input = null;
+
     String schemaFileName = configs.getStringProp("inputDataSchema");
-    input = Configs.class.getResourceAsStream("/" + schemaFileName);
+    return readResourceFile(schemaFileName);
+
+  }
+
+  /**
+   * Read a resource file
+   * 
+   * @param fileName
+   * @return
+   */
+  private static String readResourceFile(String fileName) {
+    InputStream input;
+    input = Configs.class.getResourceAsStream("/" + fileName);
 
     BufferedReader reader = new BufferedReader(new InputStreamReader(input));
     StringBuilder out = new StringBuilder();
@@ -116,7 +128,6 @@ public class AppUtils {
       return null;
     }
     return out.toString();
-
   }
 
   /**

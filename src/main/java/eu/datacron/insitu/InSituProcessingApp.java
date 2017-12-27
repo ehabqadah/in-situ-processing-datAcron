@@ -100,7 +100,7 @@ public class InSituProcessingApp {
 
     // Execute program
 
-    LOG.info(env.getExecutionPlan());
+    LOG.info("{}", env.getExecutionPlan());
 
     JobExecutionResult executionResult = null;
     try {
