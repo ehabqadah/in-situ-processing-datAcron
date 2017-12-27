@@ -13,16 +13,22 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import eu.datacron.insitu.common.utils.Configs;
 import eu.datacron.insitu.flink.utils.StreamExecutionEnvBuilder;
 
+
+
 /**
  * A Flink hdfs to kafka writer
  * 
  * @author ehab.qadah
  *
  */
-public class HDFSToKafkaProducer {
+public class HdfsToKafkaProducer {
 
   private static Configs configs = Configs.getInstance();
 
+  /**
+   * The main entry method
+   * 
+   */
   public static void main(String[] args) throws Exception {
 
     String cehkPointsPath =
@@ -31,7 +37,7 @@ public class HDFSToKafkaProducer {
 
 
     int parallelism = configs.getIntProp("parallelism");
-    String inputHDFSFile = configs.getStringProp("inputHDFSFilePath");
+    String inputHdfsFile = configs.getStringProp("inputHDFSFilePath");
     String outputTopicName = configs.getStringProp("outputHDFSKafkaTopic");
 
     // Set up the execution environment
@@ -39,7 +45,8 @@ public class HDFSToKafkaProducer {
         new StreamExecutionEnvBuilder().setParallelism(parallelism).setStateBackend(cehkPointsPath)
             .build();
     // Read the HDFS file
-    DataStreamSource<String> inputTextStream = env.readTextFile(inputHDFSFile);
+    DataStreamSource<String> inputTextStream =
+        env.readTextFile(inputHdfsFile).setParallelism(parallelism);
 
     FlinkKafkaProducer010Configuration<String> myProducerConfig =
         FlinkKafkaProducer010.writeToKafkaWithTimestamps(inputTextStream, outputTopicName,

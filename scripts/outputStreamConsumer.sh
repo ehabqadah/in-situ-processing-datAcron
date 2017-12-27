@@ -30,7 +30,7 @@ done < ../src/main/resources/config.properties
 cd $KAFKA_DIR
 
 #Start the kafka consumer for output stream of in-situ processing 
-./bin/kafka-console-consumer.sh --topic $topicName --bootstrap-server $bootstrapServers --from-beginning
+./bin/kafka-console-consumer.sh --topic $topicName --bootstrap-server $bootstrapServers 
 
 
 #./bin/kafka-topics.sh --zookeeper 192.168.1.1:2181,192.168.1.2:2181,192.168.1.3:2181 --list

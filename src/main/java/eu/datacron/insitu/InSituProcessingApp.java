@@ -23,11 +23,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010.FlinkKafkaProducer010Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.datacron.insitu.areas.Area;
 import eu.datacron.insitu.areas.AreasUtils;
@@ -39,7 +42,7 @@ import eu.datacron.insitu.maritime.streams.operators.AisMessagesStreamSorter;
 import eu.datacron.insitu.maritime.streams.operators.AisStreamEnricher;
 
 /**
- * The in-situ main driver app
+ * The main in-situ driver app
  * 
  * @author ehab.qadah
  *
@@ -48,8 +51,16 @@ import eu.datacron.insitu.maritime.streams.operators.AisStreamEnricher;
 public class InSituProcessingApp {
 
   private static Configs configs = Configs.getInstance();
+  private static final Logger LOG = LoggerFactory.getLogger(InSituProcessingApp.class);
 
+  /**
+   * Main method.
+   * 
+   * @param args
+   * @throws Exception
+   */
   public static void main(String[] args) throws Exception {
+
     boolean writeOutputStreamToFile = configs.getBooleanProp("writeOutputStreamToFile");
 
     String cehkPointsPath =
@@ -89,7 +100,7 @@ public class InSituProcessingApp {
 
     // Execute program
 
-    System.out.println(env.getExecutionPlan());
+    LOG.info(env.getExecutionPlan());
 
     JobExecutionResult executionResult = null;
     try {
@@ -109,10 +120,11 @@ public class InSituProcessingApp {
   private static void writeEnrichedStream(DataStream<AisMessage> enrichedAisMessagesStream,
       String parsingConfig, boolean writeOutputStreamToFile, String outputLineDelimiter,
       String outputPath, String outputStreamTopic) throws IOException {
-    // if (writeOutputStreamToFile) {
-    // enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter)).writeAsText(
-    // outputPath, WriteMode.OVERWRITE);
-    // }
+
+    if (writeOutputStreamToFile) {
+      enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter)).writeAsText(
+          outputPath, WriteMode.OVERWRITE);
+    }
 
     // Write to Kafka
     Properties producerProps = AppUtils.getKafkaProducerProperties();
@@ -121,20 +133,13 @@ public class InSituProcessingApp {
         FlinkKafkaProducer010.writeToKafkaWithTimestamps(enrichedAisMessagesStream,
             outputStreamTopic, new AisMessageCsvSchema(parsingConfig, outputLineDelimiter),
             producerProps);
-    // the following is necessary for at-least-once delivery guarantee
     myProducerConfig.setLogFailuresOnly(false);
     myProducerConfig.setFlushOnCheckpoint(true);
 
   }
 
-  /***
+  /**
    * Setup the kayed stream of AIS messages from a raw stream.
-   * 
-   * @param env
-   * @param streamSource
-   * @param parsingConfig
-   * @param areas
-   * @return
    */
   private static KeyedStream<AisMessage, Tuple> setupKayedAisMessagesStream(
       final StreamExecutionEnvironment env, StreamSourceType streamSource, String parsingConfig,
@@ -149,11 +154,8 @@ public class InSituProcessingApp {
     return kaydAisMessagesStream;
   }
 
-  /***
-   * Get the actual data file path or kafka topic based on the stream source type value
-   * 
-   * @param streamSource
-   * @return
+  /**
+   * Get the actual data file path or kafka topic based on the stream source type value.
    */
   private static String getSourceLocationProperty(StreamSourceType streamSource) {
     switch (streamSource) {

@@ -12,15 +12,15 @@ import eu.datacron.insitu.maritime.AisMessage;
  */
 public final class AISMessagesTimeAssigner implements AssignerWithPunctuatedWatermarks<AisMessage> {
 
-  private static final int OUT_OF_ORDER_ALLOWANCE = 1000 * 90;
+  private static final int OUT_OF_ORDER_ALLOWANCE = 1000 * 60;
   private static final long serialVersionUID = -8101115432189285146L;
 
   @Override
   public long extractTimestamp(AisMessage element, long previousElementTimestamp) {
 
-    return element.getTimestamp();
+    return System.currentTimeMillis();
   }
- 
+
   @Override
   public Watermark checkAndGetNextWatermark(AisMessage lastElement, long extractedTimestamp) {
     // simply emit a watermark with every event

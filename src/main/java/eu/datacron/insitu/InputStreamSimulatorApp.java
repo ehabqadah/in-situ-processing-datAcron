@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.datacron.insitu.common.utils.Configs;
 
 /**
@@ -17,6 +20,7 @@ import eu.datacron.insitu.common.utils.Configs;
  */
 public class InputStreamSimulatorApp {
   private static Configs configs = Configs.getInstance();
+  private static final Logger LOG = LoggerFactory.getLogger(InputStreamSimulatorApp.class);
 
   public static void main(String[] args) throws Exception {
 
