@@ -7,24 +7,24 @@ The complete source code for our component can be found [here](http://datacron2.
 
 # Deployment on datAcron cluster using YARN:
 
- * Clone in-situ mdoule: `git clone http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron.git`
+ * Clone in-situ code: `git clone http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron.git`
  * Go the project directory `cd in-situ-processing-datAcron`.
  * Update the [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties) as described the `Configurations` section below.
  * Run `mvn clean package -Pbuild-jar` to compile and build the project jar.
  * Run the raw input stream  simulator ` java -cp  ..../in-situ-processing-datAcron/target/in-situ-processing-2.0.0.jar eu.datacron.insitu.InputStreamSimulatorApp`.
  * Go the Flink directory `cd .../flink-1.3.1`
  * Start Flink yarn session using  
-    ```js
+    ```
    cd ../flink-1.3.1/
-  ./bin/yarn-session.sh -n 8 -tm 8192 -s 8
+  ./bin/yarn-session.sh -n 9 -tm 8192 -s 9
 ```
  that allocates 8 Task Managers, with 8 GB of memory and 8 processing slots for each task manger.
 
 
 * To run In-situ module:
-    ```js
+    ```
    cd ../flink-1.3.1/
-   ./bin/flink run -m yarn-cluster -yn 8  ..../in-situ-processing-datAcron/target/in-situ-processing-2.0.0.jar
+   ./bin/flink run -m yarn-cluster -yn 9  ..../in-situ-processing-datAcron/target/in-situ-processing-*.jar
 ```
 * Check the output stream that has the kafka topic name in [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties)  file, in particular, the value of `outputStreamTopicName` (e.g., ais_messages_in_situ_processing_out_v2).
 
@@ -82,7 +82,7 @@ MinHeading,MaxHeading,isChangeInArea,detectedAreas`
 
 # Configurations:
 
-This section describes the different configurations/parameters that customize the execution of the In-Situ Processing module, the following are the full parameters list of the module along side with their description and usage, can be changed in the [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties)  file.
+This section describes the different configurations/parameters that customize the execution of the In-Situ Processing module, and the following are the full parameters list of the module alongside with their description and usage, can be changed in the [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties)  file.
 
 | Parameter  Name        | Example           | Description  | Used In  |
 | ------------- |:-------------:| :-----:|:------------:|

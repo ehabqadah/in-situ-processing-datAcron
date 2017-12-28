@@ -102,6 +102,7 @@ public class InSituProcessingApp {
     // Execute program
 
     LOG.info("{}", env.getExecutionPlan());
+    System.out.println(env.getExecutionPlan());
 
     JobExecutionResult executionResult = null;
     try {
