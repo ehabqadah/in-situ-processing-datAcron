@@ -3,29 +3,28 @@
 A component within the [datAcron EU](http://www.datacron-project.eu/) project; it provides a Flink component that processes a stream of raw messages (i.e., AIS Dynamic Messages), and enriches it with derived attributes such as min/max, average, and variance of original fields (See `Output Format and Samples` & `Output Schema Description`).
 In addition, a stream simulator for the raw messages is developed in the context of this module. It provides a feature to re-play the original stream of raw messages by generating a simulated new Kafka Stream and taking into the account the time delay between two consecutive messages of a trajectory. Furthermore, this delay can be scaled in/out by a configuration parameter (`streamDelayScale`).
 
-The complete source code for our component can be found [here](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron).
 
-# Deployment on datAcron cluster using YARN:
+# Deployment on datAcron YARN cluster:
 
- * Clone in-situ code: `git clone http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron.git`
+ * Clone in-situ code: `https://github.com/ehabqadah/in-situ-processing-datAcron.git`
  * Go the project directory `cd in-situ-processing-datAcron`.
  * Update the [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties) as described the `Configurations` section below.
  * Run `mvn clean package -Pbuild-jar` to compile and build the project jar.
  * Run the raw input stream  simulator ` java -cp  ..../in-situ-processing-datAcron/target/in-situ-processing-2.0.0.jar eu.datacron.insitu.InputStreamSimulatorApp`.
- * Go the Flink directory `cd .../flink-1.3.1`
+ * Go the Flink directory `cd .../flink-1.4.1`
  * Start Flink yarn session using  
     ```
    cd ../flink-1.4.0/
-  ./bin/yarn-session.sh -n 10 -tm 15360 -s 9
+  ./bin/yarn-session.sh -n 10 -tm 15360 -s 8
 ```
- that allocates 9 Task Managers, with 15 GB of memory and 8 processing slots for each task manger.
+ that allocates 10 Task Managers, with 15 GB of memory and 8 processing slots for each task manger.
 
 
 * To run In-situ module:
 
  ```
    cd ../flink-1.4.0/
-   ./bin/flink run -m yarn-cluster -yn 9  -ynm insitu16..../in-situ-processing-datAcron/target/in-situ-processing-*.jar
+   ./bin/flink run -m yarn-cluster -yn 10  -ynm insitu_p..../in-situ-processing-datAcron/target/in-situ-processing-*.jar
 ```
 * Check the output stream that has the kafka topic name in [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties)  file, in particular, the value of `outputStreamTopicName` (e.g., ais_messages_in_situ_processing_out_v2).
 
