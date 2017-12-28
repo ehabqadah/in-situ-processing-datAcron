@@ -16,13 +16,14 @@ The complete source code for our component can be found [here](http://datacron2.
  * Start Flink yarn session using  
     ```
    cd ../flink-1.3.1/
-  ./bin/yarn-session.sh -n 9 -tm 8192 -s 9
+  ./bin/yarn-session.sh -n 9 -tm 15360 -s 9
 ```
- that allocates 8 Task Managers, with 8 GB of memory and 8 processing slots for each task manger.
+ that allocates 9 Task Managers, with 15 GB of memory and 8 processing slots for each task manger.
 
 
 * To run In-situ module:
-    ```
+
+ ```
    cd ../flink-1.3.1/
    ./bin/flink run -m yarn-cluster -yn 9  ..../in-situ-processing-datAcron/target/in-situ-processing-*.jar
 ```
