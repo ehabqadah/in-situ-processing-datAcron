@@ -16,7 +16,7 @@ The complete source code for our component can be found [here](http://datacron2.
  * Start Flink yarn session using  
     ```
    cd ../flink-1.3.1/
-  ./bin/yarn-session.sh -n 9 -tm 15360 -s 9
+  ./bin/yarn-session.sh -n 10 -tm 15360 -s 9
 ```
  that allocates 9 Task Managers, with 15 GB of memory and 8 processing slots for each task manger.
 
@@ -25,7 +25,7 @@ The complete source code for our component can be found [here](http://datacron2.
 
  ```
    cd ../flink-1.3.1/
-   ./bin/flink run -m yarn-cluster -yn 9  ..../in-situ-processing-datAcron/target/in-situ-processing-*.jar
+   ./bin/flink run -m yarn-cluster -yn 9  -ynm insitu16..../in-situ-processing-datAcron/target/in-situ-processing-*.jar
 ```
 * Check the output stream that has the kafka topic name in [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties)  file, in particular, the value of `outputStreamTopicName` (e.g., ais_messages_in_situ_processing_out_v2).
 
