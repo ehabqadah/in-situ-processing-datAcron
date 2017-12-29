@@ -1,4 +1,5 @@
 # In-Situ Processing - datAcron
+[![Build Status](https://travis-ci.org/ehabqadah/in-situ-processing-datAcron.svg?branch=master)](https://travis-ci.org/ehabqadah/in-situ-processing-datAcron)
 
 A component within the [datAcron EU](http://www.datacron-project.eu/) project; it provides a Flink component that processes a stream of raw messages (i.e., AIS Dynamic Messages), and enriches it with derived attributes such as min/max, average, and variance of original fields (See `Output Format and Samples` & `Output Schema Description`).
 In addition, a stream simulator for the raw messages is developed in the context of this module. It provides a feature to re-play the original stream of raw messages by generating a simulated new Kafka Stream and taking into the account the time delay between two consecutive messages of a trajectory. Furthermore, this delay can be scaled in/out by a configuration parameter (`streamDelayScale`).
