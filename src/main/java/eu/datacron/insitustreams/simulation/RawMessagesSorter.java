@@ -55,7 +55,6 @@ public final class RawMessagesSorter extends
       queueState.update(queue);
       // register a timer to be fired when the watermark passes this message timestamp
       timerService.registerEventTimeTimer(message.f1);
-      // out.collect(message);
     } else {
       String outOfOrderErrorMessage = "out of order message: " + message.f2;
       logger.info(outOfOrderErrorMessage);

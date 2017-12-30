@@ -7,11 +7,11 @@ import java.util.List;
 import eu.datacron.insitu.maritime.AisMessage;
 
 /**
- * A class to aggregate the ais messages statistics
+ * A class to aggregate the AIS messages statistics
  * 
  * @author ehab.qadah
  */
-public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
+public class AisTrajectoryStatistics extends AbstractStatisticsWrapper<AisMessage> {
 
   private static final int MIN_NUMBER_OF_PPINTS_BEFORE_COMPUTE_VARIANCE = 2;
   private static final long serialVersionUID = -4223639731431853133L;
@@ -161,13 +161,7 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     long oldTimestamp = getLastTimestamp();
     long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
 
-    // if (timeDiff < 0) {
-    // String outOfOrderErrorMesage = "**** error key=" + aisMessage.getId() + "newTimestamp" +
-    // newTimestamp
-    // + "timeDiff=" + timeDiff;
-    // System.out.println(outOfOrderErrorMesage);
-    // throw new Exception(outOfOrderErrorMesage);
-    // }
+    // checkForMessagesOrder(aisMessage, newTimestamp, timeDiff);
 
     setLastDiffTime(timeDiff);
     setMaxDiffTime(timeDiff);
@@ -184,6 +178,17 @@ public class AisTrajectoryStatistics extends StatisticsWrapper<AisMessage> {
     // compute new average
     double newAverageTimeDiff = aggreagtedTimediffSum / pointsCount;
     setAverageDiffTime(newAverageTimeDiff);
+  }
+
+  private void checkForMessagesOrder(AisMessage aisMessage, long newTimestamp, long timeDiff)
+      throws Exception {
+    if (timeDiff < 0) {
+      String outOfOrderErrorMesage =
+          "**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp + "timeDiff="
+              + timeDiff;
+      System.out.println(outOfOrderErrorMesage);
+      throw new Exception(outOfOrderErrorMesage);
+    }
   }
 
   private void updateLocationAttributes(AisMessage aisMessage) {

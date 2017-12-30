@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-
-
 /**
  * Configurations wrapper
  * 
@@ -21,7 +19,6 @@ public class Configs implements Serializable {
   private static final long serialVersionUID = 3829172077808658556L;
 
   private static final String CONFIG_PROPERTIES_FILE = "/config.properties";
-  // static Logger logger = Logger.getLogger(Configs.class.getName());
   /** A delimiter for multiple values of the same config parameter **/
   public static final String MUTIL_VALUES_DELIMITER = ",";
 

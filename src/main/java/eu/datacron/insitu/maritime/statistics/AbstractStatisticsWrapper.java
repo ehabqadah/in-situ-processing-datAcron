@@ -10,7 +10,7 @@ import java.util.function.BinaryOperator;
 /**
  * @author ehab.qadah
  */
-public abstract class StatisticsWrapper<T> implements Serializable {
+public abstract class AbstractStatisticsWrapper<T> implements Serializable {
 
   private static final String AREAS_DELIMITER = ";";
   private static final long serialVersionUID = -8266975301330743697L;
@@ -21,7 +21,8 @@ public abstract class StatisticsWrapper<T> implements Serializable {
   /** min/max values of attributes **/
   protected double minSpeed;
   protected double maxSpeed;
-  protected long minDiffTime = Long.MAX_VALUE;// min diff time can not be set as zero initially
+  // min diff time can not be set as zero initially
+  protected long minDiffTime = Long.MAX_VALUE;
   protected long maxDiffTime;
   protected int minHeading;
   protected double minTurn;
@@ -203,7 +204,7 @@ public abstract class StatisticsWrapper<T> implements Serializable {
   }
 
   /**
-   * Process new incoming position message to update the statisticss
+   * Process new incoming position message to update the statistics
    * 
    * @param positionMessage
    * @throws Exception
@@ -240,7 +241,7 @@ public abstract class StatisticsWrapper<T> implements Serializable {
     if (detectedAreas == null) {
       return "";
     }
-    // private Set<String> detectedAreas;
+
     Optional<String> joinedString = detectedAreas.stream().reduce(new BinaryOperator<String>() {
 
       @Override

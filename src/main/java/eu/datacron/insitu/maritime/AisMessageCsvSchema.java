@@ -94,8 +94,8 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
   private AisMessage parseCSVline(String csvLine) {
     initParsingConfigObject();
     AisMessage aisMessage = new AisMessage();
-
-    String[] fieldsValue = csvLine.split(delimiter, -1);// -1 to include trailing empty strings
+    // -1 to include trailing empty strings
+    String[] fieldsValue = csvLine.split(delimiter, -1);
 
     for (Field field : AisMessage.class.getFields()) {
       String fieldName = field.getName();
@@ -113,7 +113,7 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
           // set the value of the field from the csv line using reflection
           field.set(aisMessage, castedFieldValue);
         } catch (Exception e) {
-          logger.error(e.getMessage() +" for field:"+fieldName);
+          logger.error(e.getMessage() + " for field:" + fieldName);
           // invalid line
           return null;
         }

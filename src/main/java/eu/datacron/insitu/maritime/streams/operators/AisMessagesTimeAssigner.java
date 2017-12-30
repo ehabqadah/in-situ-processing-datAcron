@@ -10,7 +10,7 @@ import eu.datacron.insitu.maritime.AisMessage;
  * 
  * @author ehab.qadah
  */
-public final class AISMessagesTimeAssigner implements AssignerWithPunctuatedWatermarks<AisMessage> {
+public final class AisMessagesTimeAssigner implements AssignerWithPunctuatedWatermarks<AisMessage> {
 
   private static final int OUT_OF_ORDER_ALLOWANCE = 1000 * 60;
   private static final long serialVersionUID = -8101115432189285146L;

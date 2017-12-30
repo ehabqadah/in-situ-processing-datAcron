@@ -6,9 +6,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.flink.api.common.ExecutionMode;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 
 /**
  * Flink Stream execution builder.
@@ -34,8 +34,7 @@ public class StreamExecutionEnvBuilder {
     env.setBufferTimeout(1000);
     env.getConfig().setExecutionMode(ExecutionMode.PIPELINED);
     env.setRestartStrategy(RestartStrategies.fixedDelayRestart(DEFAULT_NUMBER_JOB_RESTART,
-        Time.of(10, TimeUnit.SECONDS) // delay
-        ));
+        Time.of(10, TimeUnit.SECONDS)));
   }
 
   public StreamExecutionEnvBuilder setAutoWatermarkInterval(long interval) {

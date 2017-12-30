@@ -2,26 +2,25 @@ package eu.datacron.insitu.maritime;
 
 import java.io.Serializable;
 
-import eu.datacron.insitu.maritime.statistics.StatisticsWrapper;
+import eu.datacron.insitu.maritime.statistics.AbstractStatisticsWrapper;
 
 /**
  * @author ehab.qadah
  */
-public interface  PositionMessage extends Serializable {
+public interface PositionMessage extends Serializable {
 
-   String getId();
+  String getId();
 
-   void setId(String id);
+  void setId(String id);
 
-   Long getTimestamp();
+  Long getTimestamp();
 
-   void setTimestamp(Long value);
+  void setTimestamp(Long value);
 
+  AbstractStatisticsWrapper getStatistics();
 
-   StatisticsWrapper getStatistics();
+  void setStatistics(AbstractStatisticsWrapper value);
 
-   void setStatistics(StatisticsWrapper value);
-
-   String toCsv(String delimiter);
+  String toCsv(String delimiter);
 
 }

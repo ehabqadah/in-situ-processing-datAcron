@@ -15,7 +15,7 @@ import eu.datacron.insitu.areas.Area;
 import eu.datacron.insitu.areas.GeoUtils;
 import eu.datacron.insitu.maritime.AisMessage;
 import eu.datacron.insitu.maritime.statistics.AisTrajectoryStatistics;
-import eu.datacron.insitu.maritime.statistics.StatisticsWrapper;
+import eu.datacron.insitu.maritime.statistics.AbstractStatisticsWrapper;
 
 /**
  * This a map operator that processes the AIS messages stream and enrich it with new derived
@@ -29,7 +29,7 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
   /**
    * The ValueState handle for the last statistics of a trajectory
    */
-  private transient ValueState<StatisticsWrapper<AisMessage>> statisticsOfTrajectory;
+  private transient ValueState<AbstractStatisticsWrapper<AisMessage>> statisticsOfTrajectory;
   private List<Area> areas;
 
   public AisStreamEnricher() {}
@@ -40,9 +40,9 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
 
   @Override
   public void open(Configuration config) {
-    ValueStateDescriptor<StatisticsWrapper<AisMessage>> descriptor =
-        new ValueStateDescriptor<StatisticsWrapper<AisMessage>>("trajectoryStatistics",
-            TypeInformation.of(new TypeHint<StatisticsWrapper<AisMessage>>() {}));
+    ValueStateDescriptor<AbstractStatisticsWrapper<AisMessage>> descriptor =
+        new ValueStateDescriptor<AbstractStatisticsWrapper<AisMessage>>("trajectoryStatistics",
+            TypeInformation.of(new TypeHint<AbstractStatisticsWrapper<AisMessage>>() {}));
 
     statisticsOfTrajectory = getRuntimeContext().getState(descriptor);
 
@@ -50,7 +50,7 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
 
   @Override
   public AisMessage map(AisMessage value) throws Exception {
-    StatisticsWrapper<AisMessage> curreStatistics =
+    AbstractStatisticsWrapper<AisMessage> curreStatistics =
         statisticsOfTrajectory.value() == null ? new AisTrajectoryStatistics()
             : statisticsOfTrajectory.value();
 
@@ -64,7 +64,7 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     return value;
   }
 
-  private void updateAreaInfo(AisMessage value, StatisticsWrapper<AisMessage> curreStatistics) {
+  private void updateAreaInfo(AisMessage value, AbstractStatisticsWrapper<AisMessage> curreStatistics) {
 
     long startTime = System.currentTimeMillis();
     Set<String> detectedAreas = new HashSet<String>();

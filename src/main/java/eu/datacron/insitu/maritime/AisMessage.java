@@ -3,7 +3,7 @@ package eu.datacron.insitu.maritime;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.datacron.insitu.maritime.statistics.StatisticsWrapper;
+import eu.datacron.insitu.maritime.statistics.AbstractStatisticsWrapper;
 
 /**
  * AIS (Automatic Identification System) message wrapper.
@@ -36,7 +36,7 @@ public class AisMessage implements PositionMessage {
   /** Error Message Flag **/
   private String msgErrorFlag = "";
   /** The statistics of ais message trajectory */
-  public StatisticsWrapper<AisMessage> trajectoryStatistics;
+  public AbstractStatisticsWrapper<AisMessage> trajectoryStatistics;
 
   public AisMessage prevAisMessage = null;
   public List<AisMessage> prevAisMessages = new ArrayList<AisMessage>();
@@ -258,6 +258,7 @@ public class AisMessage implements PositionMessage {
     this.msgErrorFlag = msgErrorFlag;
   }
 
+  @Override
   public String toString() {
     String message =
         "AisMessage [timestamp=" + timestamp + ", id=" + id + ", longitude=" + longitude
@@ -273,13 +274,13 @@ public class AisMessage implements PositionMessage {
   }
 
   @Override
-  public StatisticsWrapper getStatistics() {
+  public AbstractStatisticsWrapper getStatistics() {
 
     return trajectoryStatistics;
   }
 
   @Override
-  public void setStatistics(StatisticsWrapper value) {
+  public void setStatistics(AbstractStatisticsWrapper value) {
     this.trajectoryStatistics = value;
 
   }
