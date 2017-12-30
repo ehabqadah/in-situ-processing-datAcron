@@ -16,15 +16,19 @@ In addition, a stream simulator for the raw messages is developed in the context
  * Start Flink yarn session using  
     ```
    cd ../flink-1.4.0/
-  ./bin/yarn-session.sh -n 10 -tm 15360 -s 8
 ```
+```
+./bin/yarn-session.sh -n 8 -tm 15360 -s 8
+```
+
  that allocates 10 Task Managers, with 15 GB of memory and 8 processing slots for each task manger.
 
 
 * To run In-situ module:
-
+```
+cd ../flink-1.4.0/
+```
  ```
-   cd ../flink-1.4.0/
    ./bin/flink run -m yarn-cluster -yn 10  -ynm insitu_p..../in-situ-processing-datAcron/target/in-situ-processing-*.jar
 ```
 * Check the output stream that has the kafka topic name in [config.properties](http://datacron2.ds.unipi.gr:9081/eqadah/in-situ-processing-datAcron/blob/master/src/main/resources/config.properties)  file, in particular, the value of `outputStreamTopicName` (e.g., ais_messages_in_situ_processing_out_v2).
