@@ -19,9 +19,10 @@ In addition, a stream simulator for the raw messages is developed in the context
 ```
 ```
 ./bin/yarn-session.sh -n 8 -tm 15360 -s 8
+
 ```
 
- that allocates 10 Task Managers, with 15 GB of memory and 8 processing slots for each task manger.
+ to allocate 10 Task Managers, with 15 GB of memory and 8 processing slots for each task manger.
 
 
 * To run In-situ module:
