@@ -161,7 +161,7 @@ public class AisTrajectoryStatistics extends AbstractStatisticsWrapper<AisMessag
     long oldTimestamp = getLastTimestamp();
     long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
 
-    // checkForMessagesOrder(aisMessage, newTimestamp, timeDiff);
+    checkForMessagesOrder(aisMessage, newTimestamp, timeDiff);
 
     setLastDiffTime(timeDiff);
     setMaxDiffTime(timeDiff);
@@ -187,7 +187,7 @@ public class AisTrajectoryStatistics extends AbstractStatisticsWrapper<AisMessag
           "**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp + "timeDiff="
               + timeDiff;
       System.out.println(outOfOrderErrorMesage);
-      throw new Exception(outOfOrderErrorMesage);
+      // throw new Exception(outOfOrderErrorMesage);
     }
   }
 

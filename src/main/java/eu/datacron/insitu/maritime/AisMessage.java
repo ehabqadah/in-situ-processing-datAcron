@@ -286,7 +286,7 @@ public class AisMessage implements PositionMessage {
   }
 
   @Override
-  public String toCsv(String delimiter) {
+  public String toCsv(String delimiter, boolean addNewLine) {
 
     String message =
         timestamp + delimiter + id + delimiter + longitude + delimiter + latitude + delimiter
@@ -296,6 +296,9 @@ public class AisMessage implements PositionMessage {
     if (getStatistics() != null) {
 
       message += delimiter + getStatistics().toCsv(delimiter);
+    }
+    if (addNewLine) {
+      message += System.lineSeparator();
     }
     return message;
 

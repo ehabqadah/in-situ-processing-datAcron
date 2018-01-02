@@ -1,6 +1,7 @@
 package eu.datacron.insitu;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +28,19 @@ public class TestApp {
 
   public static void main(String[] args) throws IOException {
 
+    int i = 0;
+    try (BufferedReader br =
+        new BufferedReader(new FileReader(
+            "/home/ehabqadah/hdd2/Data/datAcron/WP1/outputs/T1.3/enriched_nari_dynamic.csv"))) {
+      String messageLine;
+      while ((messageLine = br.readLine()) != null) {
+        i++;
+        System.out.println(messageLine.split(",").length);
+      }
 
+    }
+
+    System.out.println("File lines:" + i);
     List<Area> areas = AreasUtils.getAllAreas("static-data/polygons.csv");
     System.out.println(areas.size());
     // for (Area area : areas) {

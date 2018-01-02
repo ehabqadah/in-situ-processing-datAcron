@@ -71,10 +71,8 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
   @Override
   public byte[] serialize(AisMessage element) {
 
-    String csvLine = element.toCsv(outputLineDelimiter);
-    if (addNewLine) {
-      csvLine += "\n";
-    }
+    String csvLine = element.toCsv(outputLineDelimiter, addNewLine);
+
     return csvLine.getBytes(StandardCharsets.UTF_8);
   }
 
