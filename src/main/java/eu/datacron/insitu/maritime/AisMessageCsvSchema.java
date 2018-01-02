@@ -111,7 +111,8 @@ public class AisMessageCsvSchema implements SerializationSchema<AisMessage>,
           // set the value of the field from the csv line using reflection
           field.set(aisMessage, castedFieldValue);
         } catch (Exception e) {
-          logger.error(e.getMessage() + " for field:" + fieldName);
+          String msg = e.getMessage() + " for field:" + fieldName + " raw message:" + csvLine;
+          logger.error(msg);
           // invalid line
           return null;
         }

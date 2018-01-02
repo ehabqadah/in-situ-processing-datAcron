@@ -49,43 +49,24 @@ public class FileLinesStreamSource implements SourceFunction<String> {
   @Override
   public void run(SourceContext<String> ctx) throws Exception {
 
-    Thread.sleep(1000);
-    long oldTimeStamp = 0;
     while (running) {
 
       try (BufferedReader br = new BufferedReader(new FileReader(dataFilePath))) {
         String messageLine;
         while ((messageLine = br.readLine()) != null) {
-          i++;
-          long newTime = 0;
-          try {
-            newTime = Long.parseLong(messageLine.split(delimiter)[timeStampIndex]);
-          } catch (NumberFormatException e) {
-            logger.error(e.getMessage() + " for line:" + messageLine);
-          }
-          ctx.collectWithTimestamp(messageLine, newTime);
 
-          if (i == 1 && warmupWait) {
-            // warm up waiting time
-            Thread.sleep(BOOTSTRAP_TIME);
-          }
-          long delay = 0;
-          if (oldTimeStamp != 0) {
-            delay = newTime - oldTimeStamp;
-          }
-          oldTimeStamp = newTime;
-          if (delay < 0) {
-            System.out.println("nagative delay" + delay + " ---- i " + i + "---- line"
-                + messageLine);
-          }
+
+          ctx.collect(messageLine);
+          i++;
         }
       } catch (Exception e) {
 
-        logger.error(e.getMessage(), e);
+        logger.info(e.getMessage());
+        System.out.println(i + e.getMessage());
         break;
       }
 
-      Thread.sleep(600000);
+      Thread.sleep(1000 * 60);
       running = false;
     }
   }

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.datacron.insitu.maritime.AisMessage;
 
 /**
@@ -17,6 +20,7 @@ public class AisTrajectoryStatistics extends AbstractStatisticsWrapper<AisMessag
   private static final long serialVersionUID = -4223639731431853133L;
   private double onlineSpeedMean;
   private double aggregatedSumOfSquaresMeanDiffs;
+  private static final Logger LOG = LoggerFactory.getLogger(AisTrajectoryStatistics.class);
 
   public AisTrajectoryStatistics() {
     setNumberOfPoints(0);
@@ -161,7 +165,7 @@ public class AisTrajectoryStatistics extends AbstractStatisticsWrapper<AisMessag
     long oldTimestamp = getLastTimestamp();
     long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
 
-    checkForMessagesOrder(aisMessage, newTimestamp, timeDiff);
+    checkForMessagesOrder(aisMessage, newTimestamp, timeDiff, oldTimestamp);
 
     setLastDiffTime(timeDiff);
     setMaxDiffTime(timeDiff);
@@ -180,14 +184,13 @@ public class AisTrajectoryStatistics extends AbstractStatisticsWrapper<AisMessag
     setAverageDiffTime(newAverageTimeDiff);
   }
 
-  private void checkForMessagesOrder(AisMessage aisMessage, long newTimestamp, long timeDiff)
-      throws Exception {
+  private void checkForMessagesOrder(AisMessage aisMessage, long newTimestamp, long timeDiff,
+      long oldTimestamp) throws Exception {
     if (timeDiff < 0) {
       String outOfOrderErrorMesage =
-          "**** error key=" + aisMessage.getId() + "newTimestamp" + newTimestamp + "timeDiff="
-              + timeDiff;
-      System.out.println(outOfOrderErrorMesage);
-      // throw new Exception(outOfOrderErrorMesage);
+          "out of order detected key=" + aisMessage.getId() + "newTimestamp=" + newTimestamp
+              + " oldTime=" + oldTimestamp;
+      LOG.error(outOfOrderErrorMesage);
     }
   }
 
