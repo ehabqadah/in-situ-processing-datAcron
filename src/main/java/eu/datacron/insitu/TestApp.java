@@ -30,8 +30,7 @@ public class TestApp {
 
     int i = 0;
     try (BufferedReader br =
-        new BufferedReader(new FileReader(
-            "/home/ehabqadah/hdd2/Data/datAcron/WP1/outputs/T1.3/enriched_nari_dynamic.csv"))) {
+        new BufferedReader(new FileReader("/opt/datAcron/insitu/data/output/nari_out.csv"))) {
       String messageLine;
       while ((messageLine = br.readLine()) != null) {
         i++;

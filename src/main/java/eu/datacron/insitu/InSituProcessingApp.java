@@ -71,7 +71,7 @@ public class InSituProcessingApp {
     StreamSourceType streamSource =
         StreamSourceType.valueOf(configs.getStringProp("streamSourceType").toUpperCase());
     String outputLineDelimiter = configs.getStringProp("outputLineDelimiter");
-    String outputPath = configs.getStringProp("outputFilePath") + appVersion;
+    String outputPath = configs.getStringProp("outputFilePath");
     int parallelism = configs.getIntProp("parallelism");
     String ploygonsFilePath = configs.getStringProp("polygonsFilePath");
     String outputStreamTopic = configs.getStringProp("outputStreamTopicName");
@@ -126,6 +126,7 @@ public class InSituProcessingApp {
     if (writeOutputStreamToFile) {
       enrichedAisMessagesStream.map(new AisMessagesToCsvMapper(outputLineDelimiter)).writeAsText(
           outputPath, WriteMode.OVERWRITE);
+      return;
     }
 
     // Write to Kafka
