@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 
+import eu.datacron.insitu.areas.Area;
+
 /**
  * @author ehab.qadah
  */
@@ -33,7 +35,7 @@ public abstract class AbstractStatisticsWrapper<T> implements Serializable {
   protected double maxLat;
   protected int maxHeading;
   protected double maxTurn;
-  private Set<String> detectedAreas;
+  private Set<Area> detectedAreas;
   private boolean changeInArea;
 
   private List<Double> prevSpeeds = new ArrayList<Double>();
@@ -221,11 +223,11 @@ public abstract class AbstractStatisticsWrapper<T> implements Serializable {
     this.prevSpeeds = prevSpeeds;
   }
 
-  public Set<String> getDetectedAreas() {
+  public Set<Area> getDetectedAreas() {
     return detectedAreas;
   }
 
-  public void setDetectedAreas(Set<String> detectedAreas) {
+  public void setDetectedAreas(Set<Area> detectedAreas) {
     this.detectedAreas = detectedAreas;
   }
 
@@ -238,18 +240,23 @@ public abstract class AbstractStatisticsWrapper<T> implements Serializable {
   }
 
   public String getDetectedAreasStr() {
+    return getDetectedAreasStr(this.detectedAreas);
+  }
+
+  public static String getDetectedAreasStr(Set<Area> detectedAreas) {
     if (detectedAreas == null) {
       return "";
     }
 
-    Optional<String> joinedString = detectedAreas.stream().reduce(new BinaryOperator<String>() {
+    Optional<String> joinedString =
+        detectedAreas.stream().map(area -> area.getId()).reduce(new BinaryOperator<String>() {
 
-      @Override
-      public String apply(String t, String u) {
+          @Override
+          public String apply(String t, String u) {
 
-        return t + AREAS_DELIMITER + u;
-      }
-    });
+            return t + AREAS_DELIMITER + u;
+          }
+        });
     return joinedString.orElse("");
   }
 }

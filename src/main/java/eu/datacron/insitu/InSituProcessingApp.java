@@ -80,7 +80,7 @@ public class InSituProcessingApp {
 
     List<Area> areas = AreasUtils.getAllAreas(ploygonsFilePath);
 
-    System.out.println("number of areas" + areas.size());
+    System.out.println("number of areas= " + areas.size());
     // Set up the execution environment
     final StreamExecutionEnvironment env =
         new StreamExecutionEnvBuilder().setParallelism(parallelism).setStateBackend(cehkPointsPath)
@@ -92,15 +92,13 @@ public class InSituProcessingApp {
     KeyedStream<AisMessage, Tuple> kayedMessagesStreamWithOrder =
         setupOrderStream(kaydAisMessagesStream);
 
-
+    // Enrich the stream with statistics
     DataStream<AisMessage> enrichedAisMessagesStream =
         kayedMessagesStreamWithOrder.map(new AisStreamEnricher(areas));
 
-    enrichedAisMessagesStream.map(tp -> tp.getOriginalRawMessage()).writeAsText(outputPath,
-        WriteMode.OVERWRITE);
     // Write the enriched stream to Kafka or file
-    // writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOutputStreamToFile,
-    // outputLineDelimiter, outputPath, outputStreamTopic);
+    writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOutputStreamToFile,
+        outputLineDelimiter, outputPath, outputStreamTopic);
 
     // Execute program
 

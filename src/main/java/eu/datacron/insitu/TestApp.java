@@ -3,12 +3,14 @@ package eu.datacron.insitu;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.json.JSONObject;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -28,26 +30,43 @@ public class TestApp {
 
   public static void main(String[] args) throws IOException {
 
+    Map<String, Boolean> areasMap = new HashMap<>();
     int i = 0;
     try (BufferedReader br =
         new BufferedReader(new FileReader("/opt/datAcron/insitu/data/output/nari_out.csv"))) {
       String messageLine;
       while ((messageLine = br.readLine()) != null) {
         i++;
-        System.out.println(messageLine.split(",").length);
+        String[] split = messageLine.split(",");
+        if (split.length == 29) {
+          String[] areas = split[28].split(";");
+
+          for (String area : areas) {
+            if (!areasMap.containsKey(area)) {
+              areasMap.put(area, true);
+            }
+          }
+        }
       }
 
     }
 
+    System.out.println(areasMap.keySet().size());
     System.out.println("File lines:" + i);
     List<Area> areas = AreasUtils.getAllAreas("static-data/polygons.csv");
-    System.out.println(areas.size());
-    // for (Area area : areas) {
-    //
-    // byte[] messageBytes=(area.getId()+"|"+area.getPolygon().toText()+"\n").getBytes();
-    // Files.write(Paths.get("static-data/areas.csv"), messageBytes, StandardOpenOption.APPEND);
-    // }
+    System.out.println("areas=" + areas.size());
+    StringBuilder filterAreas = new StringBuilder();
+    for (Area area : areas) {
 
+      if (areasMap.containsKey(area.getId())) {
+        filterAreas.append(area.originalWKT + "\n");
+        areasMap.put(area.getId(), false);
+      }
+    }
+
+    byte[] messageBytes = filterAreas.toString().getBytes();
+    Files.write(Paths.get("src/main/resources/static-data/new-ploygons.csv"), messageBytes,
+        StandardOpenOption.CREATE_NEW);
     String test =
         "area1488486400|-3.599999999999999,49.800705375|-3.604459,49.800148|-3.6047180123333384,49.8|-3.6999999999999993,49.8|-3.6999999999999993,49.9|-3.599999999999999,49.9";
     String[] splits = test.split("\\|");
@@ -68,24 +87,6 @@ public class TestApp {
     System.out.println(fields.length);
     System.out.println(configs.getStringProp("streamSourceType"));
 
-    InputStream input = null;
-    input = Configs.class.getResourceAsStream("/IMIS_Global_CSV_Schema.json");
-
-
-    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-    StringBuilder out = new StringBuilder();
-    String line;
-    while ((line = reader.readLine()) != null) {
-      out.append(line);
-    }
-    JSONObject criticalPointJson = new JSONObject(out.toString());
-    System.out.println(out.toString()); // Prints the string content read from input stream
-    reader.close();
-
-
-
   }
-
-
 
 }

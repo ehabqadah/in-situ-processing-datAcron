@@ -39,7 +39,9 @@ public class AreasUtils {
         String[] fields = areaLine.split(FIELDS_DELIMITER);
         String areaID = fields[0];
         Polygon polygon = getPolygonOfArea(Arrays.copyOfRange(fields, 1, fields.length));
-        areas.add(new Area(areaID, polygon));
+        Area newArea = new Area(areaID, polygon);
+        // newArea.originalWKT = areaLine;
+        areas.add(newArea);
       }
     } catch (IOException e) {
 

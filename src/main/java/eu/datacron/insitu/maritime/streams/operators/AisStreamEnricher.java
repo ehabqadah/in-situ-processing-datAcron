@@ -64,28 +64,50 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     return value;
   }
 
-  private void updateAreaInfo(AisMessage value,
+  private void updateAreaInfo(AisMessage newMessage,
       AbstractStatisticsWrapper<AisMessage> curreStatistics) {
 
     long startTime = System.currentTimeMillis();
-    Set<String> detectedAreas = new HashSet<String>();
-    // Get all area which vessel within
-    for (Area area : areas) {
-      if (GeoUtils.isPointInPolygon(area.getPolygon(), value.getLongitude(), value.getLatitude())) {
-        detectedAreas.add(area.getId());
+    Set<Area> currentDetectedAreas = curreStatistics.getDetectedAreas();
+    Set<Area> newDetectedAreas = new HashSet<Area>();
+
+    // Check first previous areas if they still valid
+
+    if (currentDetectedAreas != null) {
+
+      for (Area area : currentDetectedAreas) {
+        if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
+            newMessage.getLatitude())) {
+          newDetectedAreas.add(area);
+        }
       }
+    }
+    // Get all area which position message within
+    for (Area area : areas) {
       // Only attach two areas
-      if (detectedAreas.size() > 1) {
+      if (newDetectedAreas.size() > 1) {
         break;
       }
+
+      if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
+          newMessage.getLatitude())) {
+        newDetectedAreas.add(area);
+      }
+
     }
     boolean changeInArea = false;
-    if (curreStatistics.getDetectedAreas() != null
-        && !curreStatistics.getDetectedAreas().equals(detectedAreas)) {
-      changeInArea = true;
+    // Check for change in area
+    if (currentDetectedAreas != null) {
+      String currentDetectedAreasStr =
+          AbstractStatisticsWrapper.getDetectedAreasStr(currentDetectedAreas);
+      String newDetectedAreasStr = AbstractStatisticsWrapper.getDetectedAreasStr(newDetectedAreas);
+
+      if (!currentDetectedAreasStr.equals(newDetectedAreasStr)) {
+        changeInArea = true;
+      }
     }
     // update area info
-    curreStatistics.setDetectedAreas(detectedAreas);
+    curreStatistics.setDetectedAreas(newDetectedAreas);
     curreStatistics.setChangeInArea(changeInArea);
 
     // System.out.println("latency:" + (System.currentTimeMillis() - startTime));

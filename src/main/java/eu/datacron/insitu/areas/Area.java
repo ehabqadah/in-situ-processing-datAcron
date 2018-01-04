@@ -18,6 +18,7 @@ public class Area implements Serializable {
    **/
   private String id;
   private Polygon polygon;
+  public String originalWKT;
 
   /**
    * --------------------------------------------------------------------------------------------
@@ -25,7 +26,6 @@ public class Area implements Serializable {
    * --------------------------------------------------------------------------------------------
    **/
 
-  public Area() {}
 
   public Area(String id, Polygon polygon) {
 
