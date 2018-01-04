@@ -39,7 +39,6 @@ import eu.datacron.insitu.flink.utils.StreamExecutionEnvBuilder;
 import eu.datacron.insitu.maritime.AisMessage;
 import eu.datacron.insitu.maritime.AisMessageCsvSchema;
 import eu.datacron.insitu.maritime.streams.operators.AisMessagesStreamSorter;
-import eu.datacron.insitu.maritime.streams.operators.AisStreamEnricher;
 
 /**
  * The main in-situ driver app
@@ -89,15 +88,18 @@ public class InSituProcessingApp {
     KeyedStream<AisMessage, Tuple> kaydAisMessagesStream =
         setupKayedAisMessagesStream(env, streamSource, parsingConfig, outputLineDelimiter);
 
-    KeyedStream<AisMessage, Tuple> kaydAisMessagesStreamWithOrder =
+    KeyedStream<AisMessage, Tuple> kayedMessagesStreamWithOrder =
         setupOrderStream(kaydAisMessagesStream);
 
-    DataStream<AisMessage> enrichedAisMessagesStream =
-        kaydAisMessagesStreamWithOrder.map(new AisStreamEnricher(areas));
+    kayedMessagesStreamWithOrder.map(tp -> tp.getOriginalRawMessage()).writeAsText(outputPath,
+        WriteMode.OVERWRITE);
+
+    // DataStream<AisMessage> enrichedAisMessagesStream =
+    // kayedMessagesStreamWithOrder.map(new AisStreamEnricher(areas));
 
     // Write the enriched stream to Kafka or file
-    writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOutputStreamToFile,
-        outputLineDelimiter, outputPath, outputStreamTopic);
+    // writeEnrichedStream(enrichedAisMessagesStream, parsingConfig, writeOutputStreamToFile,
+    // outputLineDelimiter, outputPath, outputStreamTopic);
 
     // Execute program
 
