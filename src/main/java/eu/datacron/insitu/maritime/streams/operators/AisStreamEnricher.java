@@ -14,8 +14,8 @@ import org.apache.flink.configuration.Configuration;
 import eu.datacron.insitu.areas.Area;
 import eu.datacron.insitu.areas.GeoUtils;
 import eu.datacron.insitu.maritime.AisMessage;
-import eu.datacron.insitu.maritime.statistics.AisTrajectoryStatistics;
 import eu.datacron.insitu.maritime.statistics.AbstractStatisticsWrapper;
+import eu.datacron.insitu.maritime.statistics.AisTrajectoryStatistics;
 
 /**
  * This a map operator that processes the AIS messages stream and enrich it with new derived
@@ -64,7 +64,8 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     return value;
   }
 
-  private void updateAreaInfo(AisMessage value, AbstractStatisticsWrapper<AisMessage> curreStatistics) {
+  private void updateAreaInfo(AisMessage value,
+      AbstractStatisticsWrapper<AisMessage> curreStatistics) {
 
     long startTime = System.currentTimeMillis();
     Set<String> detectedAreas = new HashSet<String>();
@@ -72,7 +73,10 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     for (Area area : areas) {
       if (GeoUtils.isPointInPolygon(area.getPolygon(), value.getLongitude(), value.getLatitude())) {
         detectedAreas.add(area.getId());
-
+      }
+      // Only attach two areas
+      if (detectedAreas.size() > 1) {
+        break;
       }
     }
     boolean changeInArea = false;
