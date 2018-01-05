@@ -70,38 +70,53 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
 
   private void updateAreaInfo(AisMessage newMessage,
       AbstractStatisticsWrapper<AisMessage> curreStatistics) {
-
-
     Set<Area> currentDetectedAreas = curreStatistics.getDetectedAreas();
     Set<Area> newDetectedAreas = new HashSet<Area>();
     long startTime = System.currentTimeMillis();
     // Check first previous areas if they still valid
 
-    // if (currentDetectedAreas != null) {
+    if (currentDetectedAreas != null) {
+
+      for (Area area : currentDetectedAreas) {
+        if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
+            newMessage.getLatitude())) {
+          newDetectedAreas.add(area);
+        }
+      }
+    }
+
+    // Get all area which position message within
+    // for (Area area : areas) {
+    // // Only attach two areas
+    // if (newDetectedAreas.size() > 1) {
+    // break;
+    // }
     //
-    // for (Area area : currentDetectedAreas) {
     // if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
     // newMessage.getLatitude())) {
     // newDetectedAreas.add(area);
     // }
-    // }
+    //
     // }
 
-    // Get all area which position message within
-    for (Area area : areas) {
-      // Only attach two areas
-      if (newDetectedAreas.size() > 1) {
-        break;
-      }
 
-      if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
-          newMessage.getLatitude())) {
-        newDetectedAreas.add(area);
+
+    if (newDetectedAreas.size() == 0) {
+
+      Iterator<Area> detectedAreasIterator =
+          areas
+              .stream()
+              .parallel()
+              .filter(
+                  area -> GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
+                      newMessage.getLatitude())).iterator();
+
+      while (detectedAreasIterator.hasNext()) {
+        newDetectedAreas.add(detectedAreasIterator.next());
       }
 
     }
 
-    long latency1 = System.currentTimeMillis() - startTime;
     boolean changeInArea = false;
     // Check for change in area
     if (currentDetectedAreas != null) {
@@ -117,22 +132,7 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     curreStatistics.setDetectedAreas(newDetectedAreas);
     curreStatistics.setChangeInArea(changeInArea);
 
-
-
-    startTime = System.currentTimeMillis();
-    Iterator<Area> detectedAreasIterator =
-        areas
-            .stream()
-            .parallel()
-            .filter(
-                area -> GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
-                    newMessage.getLatitude())).iterator();
-
-    while (detectedAreasIterator.hasNext()) {
-      detectedAreasIterator.next();
-    }
-    long latency2 = System.currentTimeMillis() - startTime;
-
-    LOG.info("latency1:" + latency1 + " latency2:" + latency2);
+    long latency = System.currentTimeMillis() - startTime;
+    LOG.info("latency:" + latency);
   }
 }

@@ -27,7 +27,7 @@
 		<log4j.version>1.2.17</log4j.version>
 		<scala.binary.version>2.11</scala.binary.version>
 		<kafka.version>0.10.2.1</kafka.version>
-		<geotools.version>15.1</geotools.version>
+		<geotools.version>17.4</geotools.version>
 	</properties>
 
 	<repositories>
@@ -96,6 +96,7 @@
 			<version>20170516</version>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-shapefile</artifactId>
@@ -106,7 +107,7 @@
 			<artifactId>gt-swing</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
-
+		
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>

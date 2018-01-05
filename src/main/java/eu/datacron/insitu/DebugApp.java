@@ -3,12 +3,11 @@ package eu.datacron.insitu;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.geometry.jts.JTSFactoryFinder;
 
@@ -19,17 +18,19 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import eu.datacron.insitu.areas.Area;
 import eu.datacron.insitu.areas.AreasUtils;
+import eu.datacron.insitu.areas.GeoUtils;
 import eu.datacron.insitu.common.utils.Configs;
 
 /**
  * @author ehab.qadah
  */
-public class TestApp {
+public class DebugApp {
 
   private static Configs configs = Configs.getInstance();
 
   public static void main(String[] args) throws IOException {
 
+    List<Area> areas = AreasUtils.getAllAreas("static-data/polygons.csv");
     Map<String, Boolean> areasMap = new HashMap<>();
     int i = 0;
     try (BufferedReader br =
@@ -39,34 +40,36 @@ public class TestApp {
         i++;
         String[] split = messageLine.split(",");
         if (split.length == 29) {
-          String[] areas = split[28].split(";");
+          String areasStr = split[28];
+          Set<Area> newDetectedAreas = new HashSet<Area>();
+          for (Area area : areas) {
 
-          for (String area : areas) {
-            if (!areasMap.containsKey(area)) {
-              areasMap.put(area, true);
+            boolean x =
+                GeoUtils.isPointInPolygon(area.getPolygon(), Double.parseDouble(split[2]),
+                    Double.parseDouble(split[3]));
+            if (x == true) {
+              if (!areasStr.contains(area.getId()))
+                System.out.println("old:" + areasStr + "\nnew:" + area.getId());
             }
           }
+
+
         }
       }
 
     }
-
+    //
     System.out.println(areasMap.keySet().size());
     System.out.println("File lines:" + i);
-    List<Area> areas = AreasUtils.getAllAreas("static-data/polygons.csv");
+
     System.out.println("areas=" + areas.size());
     StringBuilder filterAreas = new StringBuilder();
-    for (Area area : areas) {
+    long start = System.currentTimeMillis();
 
-      if (areasMap.containsKey(area.getId())) {
-        filterAreas.append(area.originalWKT + "\n");
-        areasMap.put(area.getId(), false);
-      }
-    }
-
+    System.out.println("time= " + (System.currentTimeMillis() - start));
     byte[] messageBytes = filterAreas.toString().getBytes();
-    Files.write(Paths.get("src/main/resources/static-data/new-ploygons.csv"), messageBytes,
-        StandardOpenOption.CREATE_NEW);
+    // Files.write(Paths.get("src/main/resources/static-data/new-ploygons.csv"), messageBytes,
+    // StandardOpenOption.CREATE_NEW);
     String test =
         "area1488486400|-3.599999999999999,49.800705375|-3.604459,49.800148|-3.6047180123333384,49.8|-3.6999999999999993,49.8|-3.6999999999999993,49.9|-3.599999999999999,49.9";
     String[] splits = test.split("\\|");
@@ -88,5 +91,4 @@ public class TestApp {
     System.out.println(configs.getStringProp("streamSourceType"));
 
   }
-
 }

@@ -149,7 +149,7 @@ public class InSituProcessingApp {
       final StreamExecutionEnvironment env, StreamSourceType streamSource, String parsingConfig,
       String outputLineDelimiter) {
     DataStream<AisMessage> aisMessagesStream =
-        AppUtils.getAISMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),
+        AppUtils.getAisMessagesStream(env, streamSource, getSourceLocationProperty(streamSource),
             parsingConfig, outputLineDelimiter);
 
     // Construct the keyed stream (i.e., trajectories stream) of the AIS messages by grouping them

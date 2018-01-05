@@ -37,7 +37,7 @@ public class AppUtils {
    * @param areas
    * @return
    */
-  public static DataStream<AisMessage> getAISMessagesStream(StreamExecutionEnvironment env,
+  public static DataStream<AisMessage> getAisMessagesStream(StreamExecutionEnvironment env,
       StreamSourceType streamSource, String filePathOrTopicProperty, String parsingConfig,
       String outputLineDelimiter) {
     DataStream<AisMessage> aisMessagesStream = null;

@@ -54,7 +54,9 @@ public class GeoUtils {
     Coordinate coord = new Coordinate(longtitude, latitude);
     Point point = geometryFactory.createPoint(coord);
 
-    return polygon.intersection(point).equals(point);
+    // return polygon.intersection(point).equals(point);
+
+    return polygon.contains(point);
   }
 
   /**
