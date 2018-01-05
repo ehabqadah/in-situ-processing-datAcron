@@ -24,6 +24,6 @@ public class AisMessagesToCsvMapper implements MapFunction<AisMessage, String> {
   @Override
   public String map(AisMessage value) throws Exception {
 
-    return value.toCsv(delimiter, true);
+    return value.toCsv(delimiter, false);
   }
 }
