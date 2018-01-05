@@ -165,7 +165,7 @@ public class AisTrajectoryStatistics extends AbstractStatisticsWrapper<AisMessag
     long oldTimestamp = getLastTimestamp();
     long timeDiff = getNumberOfPoints() == 0 ? 0 : newTimestamp - oldTimestamp;
 
-    // checkForMessagesOrder(aisMessage, newTimestamp, timeDiff, oldTimestamp);
+    checkForMessagesOrder(aisMessage, newTimestamp, timeDiff, oldTimestamp);
 
     setLastDiffTime(timeDiff);
     setMaxDiffTime(timeDiff);

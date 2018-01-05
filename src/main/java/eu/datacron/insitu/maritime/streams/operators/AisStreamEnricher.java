@@ -75,47 +75,19 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     long startTime = System.currentTimeMillis();
     // Check first previous areas if they still valid
 
-    if (currentDetectedAreas != null) {
 
-      for (Area area : currentDetectedAreas) {
-        if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
-            newMessage.getLatitude())) {
-          newDetectedAreas.add(area);
-        }
-      }
+    Iterator<Area> detectedAreasIterator =
+        areas
+            .stream()
+            .parallel()
+            .filter(
+                area -> GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
+                    newMessage.getLatitude())).iterator();
+
+    while (detectedAreasIterator.hasNext()) {
+      newDetectedAreas.add(detectedAreasIterator.next());
     }
 
-    // Get all area which position message within
-    // for (Area area : areas) {
-    // // Only attach two areas
-    // if (newDetectedAreas.size() > 1) {
-    // break;
-    // }
-    //
-    // if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
-    // newMessage.getLatitude())) {
-    // newDetectedAreas.add(area);
-    // }
-    //
-    // }
-
-
-
-    if (newDetectedAreas.size() == 0) {
-
-      Iterator<Area> detectedAreasIterator =
-          areas
-              .stream()
-              .parallel()
-              .filter(
-                  area -> GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
-                      newMessage.getLatitude())).iterator();
-
-      while (detectedAreasIterator.hasNext()) {
-        newDetectedAreas.add(detectedAreasIterator.next());
-      }
-
-    }
 
     boolean changeInArea = false;
     // Check for change in area
@@ -133,6 +105,6 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     curreStatistics.setChangeInArea(changeInArea);
 
     long latency = System.currentTimeMillis() - startTime;
-    LOG.info("latency:" + latency);
+    // LOG.info("latency:" + latency);
   }
 }

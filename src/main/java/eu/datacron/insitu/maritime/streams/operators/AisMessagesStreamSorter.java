@@ -23,7 +23,7 @@ import eu.datacron.insitu.maritime.PositionMessagesComparator;
 public final class AisMessagesStreamSorter extends ProcessFunction<AisMessage, AisMessage> {
 
 
-  private static final int MAX_NUMBER_OF_QUEUED_ELEMENTS = 25;
+  private static final int MAX_NUMBER_OF_QUEUED_ELEMENTS = 30;
   private static final long serialVersionUID = 5650060885845557953L;
   static Logger logger = Logger.getLogger(AisMessagesStreamSorter.class.getName());
   private ValueState<PriorityQueue<AisMessage>> queueState = null;
@@ -46,7 +46,8 @@ public final class AisMessagesStreamSorter extends ProcessFunction<AisMessage, A
 
     PriorityQueue<AisMessage> queue = queueState.value();
     if (queue == null) {
-      queue = new PriorityQueue<>(15, new PositionMessagesComparator());
+      queue =
+          new PriorityQueue<>(MAX_NUMBER_OF_QUEUED_ELEMENTS + 1, new PositionMessagesComparator());
     }
     long timestamp = System.currentTimeMillis();
     if (context.timestamp() > timerService.currentWatermark()) {
