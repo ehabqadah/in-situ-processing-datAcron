@@ -38,7 +38,7 @@ cd $KAFKA_DIR
 
 # ./bin/kafka-console-consumer.sh --topic rdfizer_output_v2 --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092 --from-beginning
 
-#./kafkaTunnel.sh --remote-machine ehabq@datacron2.ds.unipi.gr --zookeeper 192.168.1.2:2181,192.168.1.3:2181,192.168.1.5:2181 --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092
+#./kafkaTunnel.sh --remote-machine ehabq@datacron1.ds.unipi.gr --zookeeper 192.168.1.2:2181,192.168.1.3:2181,192.168.1.5:2181 --bootstrap-server 192.168.1.2:9092,192.168.1.3:9092,192.168.1.5:9092
 
 
  #kafkatunnel manual 10.11.85.128,10.11.82.30,10.11.83.9 10.11.80.7,10.11.80.123,10.11.81.13

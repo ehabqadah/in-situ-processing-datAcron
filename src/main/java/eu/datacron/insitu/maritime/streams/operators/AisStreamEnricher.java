@@ -1,6 +1,7 @@
 package eu.datacron.insitu.maritime.streams.operators;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +11,8 @@ import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.datacron.insitu.areas.Area;
 import eu.datacron.insitu.areas.GeoUtils;
@@ -26,6 +29,7 @@ import eu.datacron.insitu.maritime.statistics.AisTrajectoryStatistics;
 public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMessage> {
 
   private static final long serialVersionUID = -8949204796030799073L;
+  private static final Logger LOG = LoggerFactory.getLogger(AisStreamEnricher.class);
   /**
    * The ValueState handle for the last statistics of a trajectory
    */
@@ -67,21 +71,22 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
   private void updateAreaInfo(AisMessage newMessage,
       AbstractStatisticsWrapper<AisMessage> curreStatistics) {
 
-    long startTime = System.currentTimeMillis();
+
     Set<Area> currentDetectedAreas = curreStatistics.getDetectedAreas();
     Set<Area> newDetectedAreas = new HashSet<Area>();
-
+    long startTime = System.currentTimeMillis();
     // Check first previous areas if they still valid
 
-    if (currentDetectedAreas != null) {
+    // if (currentDetectedAreas != null) {
+    //
+    // for (Area area : currentDetectedAreas) {
+    // if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
+    // newMessage.getLatitude())) {
+    // newDetectedAreas.add(area);
+    // }
+    // }
+    // }
 
-      for (Area area : currentDetectedAreas) {
-        if (GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
-            newMessage.getLatitude())) {
-          newDetectedAreas.add(area);
-        }
-      }
-    }
     // Get all area which position message within
     for (Area area : areas) {
       // Only attach two areas
@@ -95,6 +100,8 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
       }
 
     }
+
+    long latency1 = System.currentTimeMillis() - startTime;
     boolean changeInArea = false;
     // Check for change in area
     if (currentDetectedAreas != null) {
@@ -110,6 +117,22 @@ public final class AisStreamEnricher extends RichMapFunction<AisMessage, AisMess
     curreStatistics.setDetectedAreas(newDetectedAreas);
     curreStatistics.setChangeInArea(changeInArea);
 
-    // System.out.println("latency:" + (System.currentTimeMillis() - startTime));
+
+
+    startTime = System.currentTimeMillis();
+    Iterator<Area> detectedAreasIterator =
+        areas
+            .stream()
+            .parallel()
+            .filter(
+                area -> GeoUtils.isPointInPolygon(area.getPolygon(), newMessage.getLongitude(),
+                    newMessage.getLatitude())).iterator();
+
+    while (detectedAreasIterator.hasNext()) {
+      detectedAreasIterator.next();
+    }
+    long latency2 = System.currentTimeMillis() - startTime;
+
+    LOG.info("latency1:" + latency1 + " latency2:" + latency2);
   }
 }
