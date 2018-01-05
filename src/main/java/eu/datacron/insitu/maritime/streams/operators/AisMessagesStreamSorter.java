@@ -23,7 +23,7 @@ import eu.datacron.insitu.maritime.PositionMessagesComparator;
 public final class AisMessagesStreamSorter extends ProcessFunction<AisMessage, AisMessage> {
 
 
-  private static final int MAX_NUMBER_OF_QUEUED_ELEMENTS = 5;
+  private static final int MAX_NUMBER_OF_QUEUED_ELEMENTS = 25;
   private static final long serialVersionUID = 5650060885845557953L;
   static Logger logger = Logger.getLogger(AisMessagesStreamSorter.class.getName());
   private ValueState<PriorityQueue<AisMessage>> queueState = null;
@@ -48,12 +48,12 @@ public final class AisMessagesStreamSorter extends ProcessFunction<AisMessage, A
     if (queue == null) {
       queue = new PriorityQueue<>(15, new PositionMessagesComparator());
     }
-
+    long timestamp = System.currentTimeMillis();
     if (context.timestamp() > timerService.currentWatermark()) {
       queue.add(message);
       queueState.update(queue);
       // register a timer to be fired when the watermark passes this message timestamp
-      timerService.registerEventTimeTimer(message.timestamp);
+      timerService.registerEventTimeTimer(timestamp);
     } else {
       // logger.info("out of order message: " + message.toString());
       // throw new Exception(timerService.currentWatermark() + "out of order message: "

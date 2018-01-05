@@ -90,7 +90,7 @@ public class InSituProcessingApp {
         setupKayedAisMessagesStream(env, streamSource, parsingConfig, outputLineDelimiter);
 
     KeyedStream<AisMessage, Tuple> kayedMessagesStreamWithOrder =
-        setupOrderStream(kaydAisMessagesStream);
+        setupOrderedStream(kaydAisMessagesStream);
 
     // Enrich the stream with statistics
     DataStream<AisMessage> enrichedAisMessagesStream =
@@ -115,7 +115,7 @@ public class InSituProcessingApp {
     System.out.println("Full execution time=" + executionResult.getNetRuntime(TimeUnit.MINUTES));
   }
 
-  private static KeyedStream<AisMessage, Tuple> setupOrderStream(
+  private static KeyedStream<AisMessage, Tuple> setupOrderedStream(
       KeyedStream<AisMessage, Tuple> kaydAisMessagesStream) {
     return kaydAisMessagesStream.process(new AisMessagesStreamSorter()).keyBy("id");
   }
