@@ -68,3 +68,4 @@ pom.xml.releaseBackup
 pom.xml.tag
 /data/
 /checkpoints/
+*deployOnYarn.log
