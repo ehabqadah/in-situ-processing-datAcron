@@ -45,11 +45,11 @@ cd $FLINK_DIR
 
 if [ $numberOfArgs -gt 0 ]; then
 
-./bin/yarn-session.sh -n $numberOfTaskManger -tm $taskMangerMemory -s $processingSlots
+./bin/yarn-session.sh -n $numberOfTaskManger -tm $taskMangerMemory -s $processingSlots & 
 
 fi 
 
-sleep 60
+sleep 90
 
 jarFile=$(find $projectWorkDir/target/in-situ-processing*.jar)
 
