@@ -1,12 +1,13 @@
 #!/bin/bash
-numberOfArgs=$#
-# Yarn configs 
 
-numberOfTaskManger=8
-taskMangerMemory=15360
-processingSlots=8
 
-# Pull code changes 
+# YARN Cluster configs 
+
+numberOfTaskManagers=10
+memoryPerTaskManager=15360
+processingSlotsPerTaskManager=8
+
+# Pull new code changes 
 
 git pull 
 
@@ -43,20 +44,20 @@ cd $FLINK_DIR
 
 # Start Yarn session  
 
-if [ $numberOfArgs -gt 0 ]; then
+#if [ $numberOfArgs -gt 0 ]; then
 
-./bin/yarn-session.sh -n $numberOfTaskManger -tm $taskMangerMemory -s $processingSlots & 
+#./bin/yarn-session.sh -n $numberOfTaskManger -tm $taskMangerMemory -s $processingSlots & 
 
-fi 
+#fi 
 
-sleep 90
+#sleep 90
 
 jarFile=$(find $projectWorkDir/target/in-situ-processing*.jar)
 
 
-jobName="in-situ-processing-$parallelism"
+jobName="in-situ-p:$parallelism-tm:$numberOfTaskManagers"
 
 
-# run it on yarn 
+# Submit a Flink program to the YARN cluster
 
-./bin/flink run -m yarn-cluster -yn $numberOfTaskManger -ynm  $jobName $jarFile  > deployOnYarn.log &
+./bin/flink run -m yarn-cluster -yn $numberOfTaskManagers -ytm $memoryPerTaskManager -ys $processingSlotsPerTaskManager  -ynm  $jobName $jarFile  > deployOnYarn.log &
